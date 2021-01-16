@@ -1,0 +1,10 @@
+.vscode
+node_modules
+*.db
+dist
+oidc_keys.json
+avatar
+env/*
+nexus-typegen.ts
+schema.graphql
+test_keys.json

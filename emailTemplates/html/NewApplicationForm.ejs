@@ -1,0 +1,41 @@
+<div style="padding: 10px;">
+    <p>
+        만화두레에 신규 <%= reApplication ? '재' : '' %>입부원서가 접수됐습니다.
+    </p>
+    <p>
+        <table style="border: 1px solid black; border-collapse: collapse;">
+            <thead>
+                <tr>
+                    <th colspan="2">입부원서</th style="border: 1px solid black; padding: 5px 10px;">
+                </tr>
+            </thead>
+            <tbody>        
+                <tr><th style="border: 1px solid black; padding: 5px 10px;">이름</th><td style="border: 1px solid black; padding: 5px 10px;"><%= form.name %></td></tr>
+                <tr><th style="border: 1px solid black; padding: 5px 10px;">학과</th><td style="border: 1px solid black; padding: 5px 10px;"><%= form.department %></td></tr>
+                <tr><th style="border: 1px solid black; padding: 5px 10px;">학번</th><td style="border: 1px solid black; padding: 5px 10px;"><%= form.studentId.toString() %></td></tr>
+                <tr><th style="border: 1px solid black; padding: 5px 10px;">생일</th><td style="border: 1px solid black; padding: 5px 10px;"><%= form.birthday.toLocaleDateString() %></td></tr>
+                <tr><th style="border: 1px solid black; padding: 5px 10px;">전화번호</th><td style="border: 1px solid black; padding: 5px 10px;"><%= form.phoneNumber %></td></tr>
+            </tbody>
+            <thead>
+                <tr><th colspan="2">추가질문</th></tr style="border: 1px solid black; padding: 5px 10px;">
+            </thead>
+            <tbody>
+                <% if (additionalAnswers.length === 0) { %>
+                    <tr><td style="border: 1px solid black; padding: 5px 10px;">없음</td></tr>
+                <% } else { %>
+                    <% for (const answer of additionalAnswers) { %>
+                        <tr>
+                            <td colspan="2"><strong>Q. <%= answer.question %></strong></td style="border: 1px solid black; padding: 5px 10px;">
+                        </tr>
+                        <tr>
+                            <td colspan="2">A. <pre><%= answer.answer %></pre></td style="border: 1px solid black; padding: 5px 10px;">
+                        </tr>
+                    <% } %>
+                <% } %>
+            </tbody>
+        </table>
+    </p>
+    <p>
+        자세한 사항은 <a href="<%= formUrl %>">여기</a>를 참고하세요.
+    </p>
+</div>

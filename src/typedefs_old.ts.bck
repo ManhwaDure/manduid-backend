@@ -1,0 +1,151 @@
+import { gql } from 'apollo-server';
+
+// TO-DO : Support custom avatar
+const typeDefs = gql`
+scalar Date
+
+type Query {
+    me: Member
+    getMembers(): [Member!]!
+    getMemberById(memberId: Int): Member
+    getCurrentRecord(memberId: Int): MemberRecord
+    getAllRecords(memberId: Int): [MemberRecord!]
+    getAvatarUrlByMember(memberId: Int): String
+}
+
+type Mutation {
+    changePassword(currentPassword: String!, newPassword: String!): Boolean!
+    changePassword(memberId: Int!, newPassword: String!): Boolean!
+    changeProfile(memberId: Int!, newProfile: UserProfileInput!): Boolean!
+    uploadAvatar(memberId: Int!, avatar: Upload!): Boolean!
+    removeAvatar(memberId: Int!): Boolean!
+
+    createMember(record: MemberRecordInput!): Member!
+    createRecord(memberId: Int!, record: MemberRecordInput!): MemberRecord!
+    createExecutiveType(name: String!): ExecutiveType!
+    changeExecutiveTypeName(oldName: String!, newName: String!): Boolean!
+    addPermissionTo(executiveTypeName: String, permission: String): Boolean!
+    removePermissionFrom(executiveTypeName: String, permission: String): Boolean!
+
+    appointAsExecutive(memberId: Int, executiveTypeName: ExecutiveTypeName): Boolean!
+    disappointExecutive(memberId: Int): Boolean!
+
+    apply(form: ApplicationFormInput): ApplicationForm
+    acceptApplicationForm(formId: String, reason: String): ApplicationAcceptance
+    denyApplicationForm(formId: String, reason: String): ApplicationAcceptance
+    getApplicationForms(): [ApplicationForm!]
+    getApplicationAcceptances(): [ApplicationAcceptance!]
+
+    handoverPresident(memberId: Int): Boolean!
+}
+
+interface ApplicationFormInput {
+  name: String!
+  department: String!
+  studentId: Int
+  phoneNumber: String!
+  birthday: DateTime
+}
+
+interface MemberRecordInput {
+    memberType: MemberType!
+    schoolRegisterationStatus: SchoolRegisterationStatus!
+    name: String!
+    department: String!
+    studentId: Int
+    phoneNumber: String!
+    birthday: Date
+}
+
+input UserProfileInput {
+    introduction: String
+    website: String
+    nickname: String
+}
+
+interface MemberFilterInput {
+    schoolRegisterationStatuses: [SchoolRegisterationStatus!]
+    memberTypes: [MemberType!]
+    queryFilterType: QueryFilterType
+    query: String
+}
+
+type ExecutiveType {
+    id: Int!
+    name: String!
+    permissions: [String!]
+}
+
+type UserProfile {
+    introduction: String
+    website: String
+    nickname: String
+    hasCustomAvatar: Boolean!
+}
+
+type Member {
+    id: Int!
+    ssoUserId: String
+}
+
+type MemberRecord {
+    memberId: Int!
+    memberType: MemberType!
+    executiveType: ExecutiveType
+    schoolRegisterationStatus: SchoolRegisterationStatus!
+    createdAt: Date!
+    name: String!
+    department: String!
+    studentId: Int
+    phoneNumber: String!
+    birthday: Date
+    isExecutive: Boolean!
+    isPresident: Boolean!
+}
+
+type ApplicationForm {
+  applicationId: String!
+  reApplication: Boolean!
+  name: String!
+  department: String!
+  studentId: Int!
+  phoneNumber: String!
+  birthday: Date!
+  applicationDate: Date!
+}
+
+type ApplicationAcceptance {
+  applicationId: String!
+  accepterId: Int!
+  accepted: Boolean!
+  reason: String!
+  acceptedAt: Date!
+}
+
+enum MemberType {
+  AssociateMember
+  RegularMember
+  HonoraryMember
+  Removed
+  Explusion
+}
+
+enum SchoolRegisterationStatus {
+  Enrolled
+  LeaveOfAbsence
+  MilitaryLeaveOfAbsence
+  Graduated
+  Expelled
+  Remove
+}
+
+enum QueryFilterType {
+    Name
+    StudentId
+    Department
+    PhoneNumber
+    SSOUserId
+}
+`;
+
+export default typeDefs;

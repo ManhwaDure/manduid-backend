@@ -1,0 +1,202 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Member {
+  id  Int @default(autoincrement()) @id
+  createdAt DateTime @default(now())
+  creatorId Int?
+  creationReason String @default("")
+  createdBy Member? @relation("Member_creator", fields: [creatorId], references: [id])
+  ssoUser SSOUser?
+  name String
+  department String
+  studentId Int
+  phoneNumber String
+  birthday DateTime?
+  isExecutive Boolean @default(false)
+  isPresident Boolean @default(false)
+  executiveTypeName String?
+  memberType MemberType
+  schoolRegisterationStatus SchoolRegisterationStatus 
+  executiveType ExecutiveType? @relation(fields: [executiveTypeName], references: [name])
+  histories MemberRecordHistory[] @relation("MemberRecordHistory_member")
+}
+
+model MemberRecordHistory {
+  @@id([memberId, createdAt])
+  memberId Int
+  createdAt DateTime @default(now())
+  creatorId Int
+  creationReason String @default("")
+  createdBy Member @relation("MemberRecordHistory_creator", fields: [creatorId], references: [id])
+  name String
+  department String
+  studentId Int
+  phoneNumber String
+  birthday DateTime?
+  isExecutive Boolean @default(false)
+  isPresident Boolean @default(false)
+  executiveTypeName String?
+  memberType MemberType
+  schoolRegisterationStatus SchoolRegisterationStatus 
+  executiveType ExecutiveType? @relation(fields: [executiveTypeName], references: [name])
+  member Member @relation("MemberRecordHistory_member", fields: [memberId], references: [id])
+}
+
+model SSOUser {
+  id String @id
+  memberId Int @unique
+  emailAddress String @unique
+  password String
+  hashAlgorithm HashAlgorithm
+  member Member @relation(fields: [memberId], references: [id])
+  // OIDC Profile
+  introduction String?
+  website String?
+  nickname String? @default("만두")
+  customAvatarTag String?
+}
+
+model GraphQlSession {
+  id String @id @default(cuid())
+  ssoUserId String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  ssoUser SSOUser @relation(fields: [ssoUserId], references: [id])
+}
+
+model ExecutiveType {
+  name String @id
+  permissions Permission[]
+}
+
+model Permission {
+  @@id([executiveTypeName, permission])
+  executiveTypeName String
+  permission String
+  executiveType ExecutiveType @relation(fields: [executiveTypeName], references: [name])
+}
+
+model Code {
+  code String @default(cuid()) @id
+  id String
+  expiresAt DateTime
+  usage CodeUsage
+  data Json
+}
+
+model ApplicationForm {
+  applicationId String @default(uuid()) @id
+  reApplication Boolean
+  name String
+  department String
+  studentId Int
+  phoneNumber String
+  birthday DateTime
+  applicationDate DateTime @default(now())
+  acceptance ApplicationAcceptance?
+}
+
+model ApplicationFormAdditionalQuestion {
+  id String @default(uuid()) @id
+  question String
+  deleted Boolean @default(false)
+  required Boolean @default(false)
+}
+
+model ApplicationFormAdditionalAnswer {
+  questionId String
+  applicationId String
+  answer String
+  question ApplicationFormAdditionalQuestion @relation(fields: [questionId], references: [id])
+  form ApplicationForm @relation(fields: [applicationId], references: [applicationId])
+  @@id([questionId, applicationId])
+}
+
+model ApplicationAcceptance {
+  applicationId String @id
+  accepterId Int
+  accepted Boolean
+  reason String
+  acceptedAt DateTime @default(now())
+  applicationForm ApplicationForm @relation(fields: [applicationId], references: [applicationId])
+  acceptedBy Member @relation(fields: [accepterId], references: [id])
+}
+
+model Subscription {
+  subscriptorId Int
+  subscriptor Member @relation(fields: [subscriptorId], references: [id])
+  target SubscriptionTarget
+  method SubscriptionMethod
+
+  @@id([subscriptorId, target, method])
+}
+
+model oauth2Client {
+  id String @id @default(cuid())
+  secret String
+  name String
+  redirectUris String
+  allowedScopes String
+}
+
+model oauth2Interaction {
+  id String @id @default(cuid())
+  params Json
+}
+
+model oauth2AuthorizationCode {
+  code String @id @default(cuid())
+  clientId String
+  nonce String?
+  userId String?
+  allowedScope String
+  expiredAt DateTime
+  client oauth2Client @relation(fields: [clientId], references: [id])
+  user SSOUser? @relation(fields: [userId], references: [id])
+}
+
+enum SubscriptionMethod {
+  Email
+}
+
+enum SubscriptionTarget {
+  NewApplicationForm
+}
+
+enum HashAlgorithm {
+  sha512
+  bcrypt
+}
+
+enum MemberType {
+  AssociateMember
+  RegularMember
+  HonoraryMember
+  Removed
+  Explusion
+}
+
+enum SchoolRegisterationStatus {
+  Enrolled
+  LeaveOfAbsence
+  MilitaryLeaveOfAbsence
+  Graduated
+  Expelled
+}
+
+enum CodeUsage {
+  ResendEmailVerification
+  EmailVerification
+  MembershipVerification
+  PasswordRecovery
+}

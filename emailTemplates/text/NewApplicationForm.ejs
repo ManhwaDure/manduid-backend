@@ -1,0 +1,13 @@
+만화두레 신규 <%= reApplication ? '재' : '' %>입부원서가 접수됐습니다.
+
+- 이름 : <%= form.name %>
+- 학과 : <%= form.department %>
+- 학번 : <%= form.studentId %>
+- 생일 : <%= form.birthday.toLocaleDateString() %>
+- 전화번호 : <%= form.phoneNumber %>
+<% for (const answer of additionalAnswers) { %>
+Q. <%= answer.question %>
+A. <%= answer.answer %>
+<% } %>
+
+이 원서를 허가 혹은 불허하거나, 자세한 사항을 보고 싶다면 다음 주소를 참고해주세요 : <%= formUrl %>
