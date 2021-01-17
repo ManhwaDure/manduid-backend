@@ -68,6 +68,7 @@
     "build": "tsc",
     "lint": "eslint src/**/*.ts",
     "start-dev": "dotenv -e ./env/.env.dev -- node ./dist",
+    "start": "dotenv -e ./env/.env.prod -- node ./dist",
     "nexus-build": "dotenv -e ./env/.env.dev -- ts-node --transpile-only ./src/build-schema.ts",
     "create-president-dev": "dotenv -e ./env/.env.dev -- node ./dist/maintenance/createPresident",
     "generate-keys": "dotenv -e ./env/.env.pord -- node ./dist/maintenance/generateKeys",
