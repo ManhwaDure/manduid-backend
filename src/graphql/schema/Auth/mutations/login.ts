@@ -1,5 +1,5 @@
 import bcrypt from 'bcrypt';
-import jsSHA from 'jsSHA';
+import jsSHA from 'jssha';
 import { extendType, nonNull, stringArg } from 'nexus';
 
 export const LoginMutation = extendType({
