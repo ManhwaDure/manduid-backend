@@ -30,7 +30,8 @@ export const LoginMutation = extendType({
         if (user === null)
           return {
             success: false,
-            errorMessage: 'Incorrect id or password',
+            errorMessage:
+              '아이디나 비밀번호가 올바르지 않습니다.',
           };
 
         let success = false;
@@ -85,7 +86,8 @@ export const LoginMutation = extendType({
         } else {
           return {
             success: false,
-            errorMessage: 'Incorrect id or password',
+            errorMessage:
+              '아이디나 비밀번호가 올바르지 않습니다.',
           };
         }
       },
