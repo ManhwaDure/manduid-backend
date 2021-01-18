@@ -1,9 +1,11 @@
-import { join } from 'path';
 import ejs from 'ejs';
 import { promises as fs } from 'fs';
+import { join } from 'path';
 
 const templateRoot = join(
   __dirname,
+  '..',
+  '..',
   '..',
   'emailTemplates'
 );
