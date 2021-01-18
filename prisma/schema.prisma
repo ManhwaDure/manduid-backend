@@ -174,7 +174,7 @@ enum SubscriptionTarget {
 }
 
 enum HashAlgorithm {
-  sha512
+  sha256
   bcrypt
 }
 

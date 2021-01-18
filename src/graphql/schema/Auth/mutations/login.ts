@@ -1,4 +1,5 @@
 import bcrypt from 'bcrypt';
+import jsSHA from 'jsSHA';
 import { extendType, nonNull, stringArg } from 'nexus';
 
 export const LoginMutation = extendType({
@@ -32,10 +33,37 @@ export const LoginMutation = extendType({
             errorMessage: 'Incorrect id or password',
           };
 
-        if (
-          user.hashAlgorithm === 'bcrypt' &&
-          (await bcrypt.compare(password, user.password))
-        ) {
+        let success = false;
+        if (user.hashAlgorithm === 'bcrypt') {
+          success = await bcrypt.compare(
+            password,
+            user.password
+          );
+        } else if (user.hashAlgorithm === 'sha256') {
+          const sha256 = new jsSHA('SHA-256', 'TEXT', {
+            encoding: 'UTF8',
+          });
+          sha256.update(password);
+          success =
+            sha256.getHash('HEX').toLowerCase() ===
+            user.password;
+          if (success) {
+            // migrate sha256 to bcrypt
+            await ctx.db.sSOUser.update({
+              where: {
+                id: user.id,
+              },
+              data: {
+                hashAlgorithm: 'bcrypt',
+                password: await bcrypt.hash(
+                  password,
+                  await bcrypt.genSalt()
+                ),
+              },
+            });
+          }
+        }
+        if (success) {
           const token = (
             await ctx.db.graphQlSession.create({
               data: {
