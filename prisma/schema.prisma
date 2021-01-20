@@ -74,6 +74,14 @@ model GraphQlSession {
   ssoUser SSOUser @relation(fields: [ssoUserId], references: [id])
 }
 
+model OidcSession {
+  id String @id @default(cuid())
+  graphQlSessionId String
+  clientId String
+  graphQlSession GraphQlSession @relation(fields: [graphQlSessionId], references: [id])
+  client oauth2Client @relation(fields: [clientId], references: [id])
+}
+
 model ExecutiveType {
   name String @id
   permissions Permission[]
