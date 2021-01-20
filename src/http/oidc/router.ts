@@ -139,7 +139,7 @@ router.get('/end_session', async (ctx) => {
       )
     ) {
       if (state) {
-        const uriObject = new URL(redirectUri);
+        const uriObject = new URL(post_logout_redirect_uri);
         uriObject.searchParams.append('state', state);
         redirectUri = uriObject.toString();
       } else {
