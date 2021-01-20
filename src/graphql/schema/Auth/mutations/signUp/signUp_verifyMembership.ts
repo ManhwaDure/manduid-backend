@@ -5,6 +5,7 @@ import {
   nonNull,
   stringArg,
 } from 'nexus';
+import { GraphQLExposableError } from '../../../../exposableError';
 
 export const signUp_verifyMembershipMutation = extendType({
   type: 'Mutation',
@@ -46,7 +47,9 @@ export const signUp_verifyMembershipMutation = extendType({
             },
           })) !== null
         )
-          throw new Error('아이디가 이미 존재합니다.');
+          throw new GraphQLExposableError(
+            '아이디가 이미 존재합니다.'
+          );
 
         const code = await ctx.db.code.create({
           data: {

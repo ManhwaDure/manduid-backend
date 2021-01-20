@@ -1,4 +1,5 @@
 import { extendType, nonNull, stringArg } from 'nexus';
+import { GraphQLExposableError } from '../../../exposableError';
 
 export const createExecutiveTypeMutation = extendType({
   type: 'Mutation',
@@ -20,7 +21,7 @@ export const createExecutiveTypeMutation = extendType({
             where: { name },
           })) !== null
         )
-          throw new Error(
+          throw new GraphQLExposableError(
             '동일한 이름의 직책이 이미 존재합니다.'
           );
 

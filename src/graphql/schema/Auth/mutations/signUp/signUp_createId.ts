@@ -1,5 +1,6 @@
 import IsEmail from 'isemail';
 import { extendType, nonNull, stringArg } from 'nexus';
+import { GraphQLExposableError } from '../../../../exposableError';
 
 export const signUp_createIdMutation = extendType({
   type: 'Mutation',
@@ -52,13 +53,19 @@ export const signUp_createIdMutation = extendType({
           token === null ||
           token.usage !== 'MembershipVerification'
         )
-          throw new Error('잘못된 토큰입니다.');
+          throw new GraphQLExposableError(
+            '잘못된 토큰입니다.'
+          );
         else if (token.expiresAt < new Date())
-          throw new Error('만료된 토큰입니다.');
+          throw new GraphQLExposableError(
+            '만료된 토큰입니다.'
+          );
         else if (id.trim().length === 0)
-          throw new Error('아이디를 입력해주세요.');
+          throw new GraphQLExposableError(
+            '아이디를 입력해주세요.'
+          );
         else if (/[^_a-zA-Z0-9]+/.test(id))
-          throw new Error(
+          throw new GraphQLExposableError(
             '아이디는 영문 대소문자, 숫자, 언더스코어(_)만 가능합니다.'
           );
         else if (
@@ -68,17 +75,19 @@ export const signUp_createIdMutation = extendType({
             },
           })) !== null
         )
-          throw new Error('이미 존재하는 아이디입니다.');
+          throw new GraphQLExposableError(
+            '이미 존재하는 아이디입니다.'
+          );
         else if (password.length < 5)
-          throw new Error(
+          throw new GraphQLExposableError(
             '비밀번호는 최소 5글자 이상이어야 합니다.'
           );
         else if (!IsEmail.validate(emailAddress))
-          throw new Error(
+          throw new GraphQLExposableError(
             '이메일 주소가 올바르지 않습니다.'
           );
         else if (!emailAddress.endsWith('@cau.ac.kr'))
-          throw new Error(
+          throw new GraphQLExposableError(
             '학교 이메일(@cau.ac.kr으로 끝나는 이메일)만 사용하실 수 있습니다.'
           );
 

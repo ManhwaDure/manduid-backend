@@ -1,4 +1,5 @@
 import { extendType, nonNull, stringArg } from 'nexus';
+import { GraphQLExposableError } from '../../../exposableError';
 
 export const resendVerificationEmailMutation = extendType({
   type: 'Mutation',
@@ -23,9 +24,13 @@ export const resendVerificationEmailMutation = extendType({
           resendToken === null ||
           resendToken.usage !== 'ResendEmailVerification'
         )
-          throw new Error('잘못된 토큰입니다.');
+          throw new GraphQLExposableError(
+            '잘못된 토큰입니다.'
+          );
         else if (resendToken.expiresAt < new Date())
-          throw new Error('만료된 토큰입니다.');
+          throw new GraphQLExposableError(
+            '만료된 토큰입니다.'
+          );
 
         const oldToken = await ctx.db.code.findUnique({
           where: {

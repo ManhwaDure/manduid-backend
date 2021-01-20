@@ -1,4 +1,5 @@
 import { extendType, intArg, nonNull } from 'nexus';
+import { GraphQLExposableError } from '../../../exposableError';
 
 export const disappointExecutiveMutation = extendType({
   type: 'Mutation',
@@ -20,9 +21,13 @@ export const disappointExecutiveMutation = extendType({
           select: { isExecutive: true },
         });
         if (member === null)
-          throw new Error('존재하지 않는 회원입니다.');
+          throw new GraphQLExposableError(
+            '존재하지 않는 회원입니다.'
+          );
         else if (!member.isExecutive)
-          throw new Error('집행부원이 아닙니다.');
+          throw new GraphQLExposableError(
+            '집행부원이 아닙니다.'
+          );
 
         await ctx.db.member.update({
           where: {

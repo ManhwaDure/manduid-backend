@@ -1,4 +1,5 @@
 import { extendType, nonNull, stringArg } from 'nexus';
+import { GraphQLExposableError } from '../../../exposableError';
 
 export const renameExecutiveTypeMutation = extendType({
   type: 'Mutation',
@@ -25,13 +26,17 @@ export const renameExecutiveTypeMutation = extendType({
             where: { name: oldName },
           })) === null
         )
-          throw new Error('존재하지 않는 직책입니다.');
+          throw new GraphQLExposableError(
+            '존재하지 않는 직책입니다.'
+          );
         else if (
           (await ctx.db.executiveType.findUnique({
             where: { name: newName },
           })) !== null
         )
-          throw new Error('이미 중복되는 직책 이름입니다.');
+          throw new GraphQLExposableError(
+            '이미 중복되는 직책 이름입니다.'
+          );
 
         await ctx.db.executiveType.update({
           where: {

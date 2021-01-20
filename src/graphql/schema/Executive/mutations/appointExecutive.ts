@@ -4,6 +4,7 @@ import {
   nonNull,
   stringArg,
 } from 'nexus';
+import { GraphQLExposableError } from '../../../exposableError';
 
 export const appointExecutiveMutation = extendType({
   type: 'Mutation',
@@ -32,7 +33,9 @@ export const appointExecutiveMutation = extendType({
             where: { id: memberId },
           })) === 0
         )
-          throw new Error('존재하지 않는 회원입니다.');
+          throw new GraphQLExposableError(
+            '존재하지 않는 회원입니다.'
+          );
 
         await ctx.db.member.update({
           where: {

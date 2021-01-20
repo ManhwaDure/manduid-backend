@@ -1,4 +1,5 @@
 import { arg, extendType, nonNull, stringArg } from 'nexus';
+import { GraphQLExposableError } from '../../../exposableError';
 
 export const updateUserProfileMutation = extendType({
   type: 'Mutation',
@@ -26,7 +27,9 @@ export const updateUserProfileMutation = extendType({
         });
 
         if (ssoUser === null)
-          throw new Error('존재하지 않는 아이디입니다.');
+          throw new GraphQLExposableError(
+            '존재하지 않는 아이디입니다.'
+          );
 
         await ctx.db.sSOUser.update({
           where: {

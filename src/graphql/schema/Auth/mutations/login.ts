@@ -1,6 +1,7 @@
 import bcrypt from 'bcrypt';
 import jsSHA from 'jssha';
 import { extendType, nonNull, stringArg } from 'nexus';
+import { GraphQLExposableError } from '../../../exposableError';
 
 export const LoginMutation = extendType({
   type: 'Mutation',
@@ -19,7 +20,8 @@ export const LoginMutation = extendType({
       },
       async resolve(root, { id, password }, ctx) {
         id = id.trim().toLowerCase();
-        if (id.length === 0) throw new Error('Empty id');
+        if (id.length === 0)
+          throw new GraphQLExposableError('Empty id');
 
         const user = await ctx.db.sSOUser.findUnique({
           where: {

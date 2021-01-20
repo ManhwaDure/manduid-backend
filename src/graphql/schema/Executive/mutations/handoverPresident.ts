@@ -4,6 +4,7 @@ import {
   intArg,
   nonNull,
 } from 'nexus';
+import { GraphQLExposableError } from '../../../exposableError';
 
 export const handoverPresidentMutation = extendType({
   type: 'Mutation',
@@ -50,7 +51,7 @@ export const handoverPresidentMutation = extendType({
         );
 
         if (nextPresident === null)
-          throw new Error(
+          throw new GraphQLExposableError(
             '학번이나 이름을 잘못 입력하셨습니다.'
           );
 

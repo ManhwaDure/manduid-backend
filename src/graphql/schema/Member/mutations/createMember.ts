@@ -1,4 +1,5 @@
 import { arg, extendType, nonNull } from 'nexus';
+import { GraphQLExposableError } from '../../../exposableError';
 
 export const createMemberMutation = extendType({
   type: 'Mutation',
@@ -23,7 +24,7 @@ export const createMemberMutation = extendType({
             },
           })) !== null
         ) {
-          throw new Error(
+          throw new GraphQLExposableError(
             '동일한 학번의 회원이 이미 존재합니다.'
           );
         } else if (
@@ -34,7 +35,7 @@ export const createMemberMutation = extendType({
             },
           })) !== null
         ) {
-          throw new Error(
+          throw new GraphQLExposableError(
             '동일한 전화번호의 회원이 존재하는 회원입니다.'
           );
         }

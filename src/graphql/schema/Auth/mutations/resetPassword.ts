@@ -1,5 +1,6 @@
 import bcrypt from 'bcrypt';
 import { extendType, nonNull, stringArg } from 'nexus';
+import { GraphQLExposableError } from '../../../exposableError';
 
 export const resetPasswordMutation = extendType({
   type: 'Mutation',
@@ -30,7 +31,7 @@ export const resetPasswordMutation = extendType({
           return false;
         else if (token.expiresAt < new Date()) return false;
         else if (newPassword.length < 5)
-          throw new Error(
+          throw new GraphQLExposableError(
             '비밀번호는 최소 5글자 이상이어야 합니다.'
           );
 

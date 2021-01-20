@@ -5,6 +5,7 @@ import {
   nonNull,
   stringArg,
 } from 'nexus';
+import { GraphQLExposableError } from '../../../exposableError';
 
 export const updateMemberMutation = extendType({
   type: 'Mutation',
@@ -36,7 +37,9 @@ export const updateMemberMutation = extendType({
         });
 
         if (member === null)
-          throw new Error('존재하지 않는 회원입니다.');
+          throw new GraphQLExposableError(
+            '존재하지 않는 회원입니다.'
+          );
 
         await ctx.db.memberRecordHistory.create({
           data: {

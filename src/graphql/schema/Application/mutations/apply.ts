@@ -1,4 +1,5 @@
 import { arg, extendType, list, nonNull } from 'nexus';
+import { GraphQLExposableError } from '../../../exposableError';
 
 export const ApplyMutation = extendType({
   type: 'Mutation',
@@ -60,7 +61,7 @@ export const ApplyMutation = extendType({
             }
           )) > 0
         )
-          throw new Error(
+          throw new GraphQLExposableError(
             '삭제된 질문에 답할 수 없습니다.'
           );
 
@@ -78,22 +79,30 @@ export const ApplyMutation = extendType({
             return acc;
           }, []).length !== 0
         )
-          throw new Error(
+          throw new GraphQLExposableError(
             '모든 필수 질문에 답하셔야 합니다.'
           );
 
         if (form.birthday < new Date(1987, 1, 1))
-          throw new Error('생일을 잘못 입력하셨습니다.');
+          throw new GraphQLExposableError(
+            '생일을 잘못 입력하셨습니다.'
+          );
         if (form.department.trim().length === 0)
-          throw new Error('학과를 입력해주세요.');
+          throw new GraphQLExposableError(
+            '학과를 입력해주세요.'
+          );
         if (form.name.trim().length === 0)
-          throw new Error('이름을 제대로 입력해주세요.');
+          throw new GraphQLExposableError(
+            '이름을 제대로 입력해주세요.'
+          );
         if (form.phoneNumber.trim().length === 0)
-          throw new Error(
+          throw new GraphQLExposableError(
             '핸드폰 번호를 제대로 입력해주세요.'
           );
         if (form.studentId <= 10000000)
-          throw new Error('학번을 올바르게 입력해주세요.');
+          throw new GraphQLExposableError(
+            '학번을 올바르게 입력해주세요.'
+          );
 
         const member = await ctx.db.member.findFirst({
           where: {
@@ -105,12 +114,14 @@ export const ApplyMutation = extendType({
           member.memberType !== 'Removed' &&
           member.memberType !== 'Explusion'
         ) {
-          throw new Error('이미 존재하는 회원입니다.');
+          throw new GraphQLExposableError(
+            '이미 존재하는 회원입니다.'
+          );
         } else if (
           member !== null &&
           member.memberType === 'Explusion'
         ) {
-          throw new Error(
+          throw new GraphQLExposableError(
             '제명된 회원은 다시 입부하실 수 없습니다'
           );
         }

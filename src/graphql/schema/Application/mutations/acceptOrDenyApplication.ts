@@ -4,6 +4,7 @@ import {
   nonNull,
   stringArg,
 } from 'nexus';
+import { GraphQLExposableError } from '../../../exposableError';
 
 export const acceptApplication = extendType({
   type: 'Mutation',
@@ -40,7 +41,7 @@ export const acceptApplication = extendType({
         );
 
         if (applicationForm === null)
-          throw new Error(
+          throw new GraphQLExposableError(
             '해당 입부원서가 존재하지 않습니다.'
           );
 
@@ -51,7 +52,9 @@ export const acceptApplication = extendType({
             },
           })) !== null
         )
-          throw new Error('이미 처리된 입부원서입니다');
+          throw new GraphQLExposableError(
+            '이미 처리된 입부원서입니다'
+          );
 
         const acceptance = await ctx.db.applicationAcceptance.create(
           {

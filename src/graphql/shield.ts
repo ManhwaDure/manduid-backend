@@ -1,6 +1,7 @@
 import { rule, shield } from 'graphql-shield';
 import { Permission } from './context/permissions';
 import { Context } from './context/types';
+import { GraphQLExposableError } from './exposableError';
 
 const isAuthenticated = rule({
   cache: 'contextual',
@@ -50,56 +51,69 @@ const isPresident = rule({
   );
 });
 
-const permissions = shield({
-  Query: {
-    me: isAuthenticated,
-    applications: hasPermission('application.read'),
-    executives: hasPermission('executive.list'),
-    executiveTypes: hasPermission('executive.type.get'),
-    getApplicationById: hasPermission('application.read'),
-    members: hasPermission('roll.list'),
-    getMemberByStudentId: hasPermission('roll.list'),
-    getMemberById: hasPermission('roll.list'),
-    oauth2Clients: hasPermission('oidc.list'),
-    subscriptions: hasPermission('subscription.list'),
+const permissions = shield(
+  {
+    Query: {
+      me: isAuthenticated,
+      applications: hasPermission('application.read'),
+      executives: hasPermission('executive.list'),
+      executiveTypes: hasPermission('executive.type.get'),
+      getApplicationById: hasPermission('application.read'),
+      members: hasPermission('roll.list'),
+      getMemberByStudentId: hasPermission('roll.list'),
+      getMemberById: hasPermission('roll.list'),
+      oauth2Clients: hasPermission('oidc.list'),
+      subscriptions: hasPermission('subscription.list'),
+    },
+    Mutation: {
+      acceptOrDenyApplication: hasAcceptOrDenyApplicationPermission,
+      appointExecutive: hasPermission('executive.appoint'),
+      createApplicationFormAdditionalQuestion: hasPermission(
+        'application.additionalQuestion.create'
+      ),
+      createExecutiveType: hasPermission(
+        'executive.type.create'
+      ),
+      createMember: hasPermission('roll.create'),
+      createSubscription: hasPermission(
+        'subscription.create'
+      ),
+      deleteApplicationFormAdditionalQuestion: hasPermission(
+        'application.additionalQuestion.delete'
+      ),
+      deleteExecutiveType: hasPermission(
+        'executive.type.remove'
+      ),
+      deleteSubscription: hasPermission(
+        'subscription.remove'
+      ),
+      disappointExecutive: hasPermission(
+        'executive.disappoint'
+      ),
+      handoverPresident: isPresident,
+      renameExecutiveType: hasPermission(
+        'executive.type.rename'
+      ),
+      updateMember: hasPermission('roll.update'),
+      updatePermission: hasPermission(
+        'executive.type.update'
+      ),
+      updateUserProfile: hasPermission(
+        'roll.updateProfile'
+      ),
+      changePassword: isAuthenticated,
+      updateMyProfile: isAuthenticated,
+    },
   },
-  Mutation: {
-    acceptOrDenyApplication: hasAcceptOrDenyApplicationPermission,
-    appointExecutive: hasPermission('executive.appoint'),
-    createApplicationFormAdditionalQuestion: hasPermission(
-      'application.additionalQuestion.create'
-    ),
-    createExecutiveType: hasPermission(
-      'executive.type.create'
-    ),
-    createMember: hasPermission('roll.create'),
-    createSubscription: hasPermission(
-      'subscription.create'
-    ),
-    deleteApplicationFormAdditionalQuestion: hasPermission(
-      'application.additionalQuestion.delete'
-    ),
-    deleteExecutiveType: hasPermission(
-      'executive.type.remove'
-    ),
-    deleteSubscription: hasPermission(
-      'subscription.remove'
-    ),
-    disappointExecutive: hasPermission(
-      'executive.disappoint'
-    ),
-    handoverPresident: isPresident,
-    renameExecutiveType: hasPermission(
-      'executive.type.rename'
-    ),
-    updateMember: hasPermission('roll.update'),
-    updatePermission: hasPermission(
-      'executive.type.update'
-    ),
-    updateUserProfile: hasPermission('roll.updateProfile'),
-    changePassword: isAuthenticated,
-    updateMyProfile: isAuthenticated,
-  },
-});
+  {
+    fallbackError: (err) => {
+      if (err instanceof GraphQLExposableError) {
+        return err;
+      } else {
+        return new Error('Server Internal Error');
+      }
+    },
+  }
+);
 
 export default permissions;

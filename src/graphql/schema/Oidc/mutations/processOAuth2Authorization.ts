@@ -1,5 +1,6 @@
 import { extendType, nonNull, stringArg } from 'nexus';
 import { verifyJwt } from '../../../../jwt';
+import { GraphQLExposableError } from '../../../exposableError';
 
 export const processOAuth2Authorization = extendType({
   type: 'Mutation',
@@ -25,7 +26,7 @@ export const processOAuth2Authorization = extendType({
         );
 
         if (interaction === null)
-          throw new Error(
+          throw new GraphQLExposableError(
             'OAuth2 Interaction ID가 잘못됐습니다.'
           );
 
@@ -53,14 +54,18 @@ export const processOAuth2Authorization = extendType({
         );
 
         if (client === null)
-          throw new Error('Invalid oauth2 client');
+          throw new GraphQLExposableError(
+            'OAuth2 Client id가 올바르지 않습니다.'
+          );
 
         if (
           !client.redirectUris
             .split('\n')
             .includes(redirect_uri)
         )
-          throw new Error('Invalid oauth2 redirect uri');
+          throw new GraphQLExposableError(
+            'Redirect_uri이 올바르지 않습니다.'
+          );
 
         // Support only authorization code grant
         if (response_type !== 'code')

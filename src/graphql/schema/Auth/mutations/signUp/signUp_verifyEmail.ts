@@ -1,5 +1,6 @@
 import bcrypt from 'bcrypt';
 import { extendType, stringArg } from 'nexus';
+import { GraphQLExposableError } from '../../../../exposableError';
 
 export const signUp_verifyEmailMutation = extendType({
   type: 'Mutation',
@@ -23,9 +24,13 @@ export const signUp_verifyEmailMutation = extendType({
           token === null ||
           token.usage !== 'EmailVerification'
         )
-          throw new Error('잘못된 토큰입니다.');
+          throw new GraphQLExposableError(
+            '잘못된 토큰입니다.'
+          );
         else if (token.expiresAt < new Date())
-          throw new Error('만료된 토큰입니다.');
+          throw new GraphQLExposableError(
+            '만료된 토큰입니다.'
+          );
 
         const {
           memberId,
@@ -46,7 +51,7 @@ export const signUp_verifyEmailMutation = extendType({
             },
           })) > 0
         )
-          throw new Error(
+          throw new GraphQLExposableError(
             '이메일 인증하는 사이 누군가가 아이디를 가로챘습니다. 다시 시도하세요.'
           );
 

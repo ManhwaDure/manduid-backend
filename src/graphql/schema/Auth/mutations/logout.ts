@@ -3,6 +3,7 @@ import { extendType, nonNull, stringArg } from 'nexus';
 import querystring from 'querystring';
 import randomString from 'random-string';
 import { createIdToken } from '../../../../jwt';
+import { GraphQLExposableError } from '../../../exposableError';
 
 export const LogoutMutation = extendType({
   type: 'Mutation',
@@ -85,19 +86,19 @@ export const LogoutMutation = extendType({
             case 200:
               continue;
             case 400:
-              throw new Error(
+              throw new GraphQLExposableError(
                 'SLO(Backchannel Logout) 진행중 잘못된 요청으로 인해 오류가 발생했습니다. 회장단에게 문의해주세요.'
               );
             case 501:
-              throw new Error(
+              throw new GraphQLExposableError(
                 'SLO(Backchannel Logout) 진행중 실패한 요청이 있습니다. 회장단에게 문의해주세요.'
               );
             case 504:
-              throw new Error(
+              throw new GraphQLExposableError(
                 'SLO(Backchannel Logout) 진행중 다운스트림 로그아웃에 실패한 요청이 있습니다. 회장단에게 문의해주세요.'
               );
             default:
-              throw new Error(
+              throw new GraphQLExposableError(
                 `SLO(Backchannel Logout) 응답을 받았으나 응답 코드가 예상하지 못한 코드(${backchannelResponse.status})입니다. 회장단에게 문의해주세요.`
               );
           }
