@@ -103,6 +103,19 @@ export const LogoutMutation = extendType({
               );
           }
         }
+
+        await ctx.db.oidcSession.deleteMany({
+          where: {
+            id: {
+              in: session.OidcSession.map((i) => i.id),
+            },
+          },
+        });
+        await ctx.db.graphQlSession.delete({
+          where: {
+            id: ctx.user.sessionId,
+          },
+        });
         return true;
       },
     });
