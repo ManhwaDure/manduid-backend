@@ -1,8 +1,9 @@
 import fs from 'fs/promises';
 import { JWKS } from 'jose';
 import Router from 'koa-router';
+import { db } from '~/db';
 import { BearerTokenError } from '../BearerTokenError';
-import { getOidcKeystore } from '../jwt';
+import { getOidcKeystore, verifyJwt } from '../jwt';
 import { authenticateToken } from '../oauth2/middlewares';
 import claims from './claims';
 
@@ -35,6 +36,7 @@ router.get('/openid-configuration', async (ctx) => {
           if (!prev.includes(value)) prev.push(value);
         return prev;
       }, []),
+    end_session_endpoint: createUrl('/end_session'),
   });
 });
 
@@ -104,5 +106,50 @@ router.get(
     ctx.body = JSON.stringify(userinfo);
   }
 );
+
+router.get('/end_session', async (ctx) => {
+  const {
+    id_token_hint,
+    post_logout_redirect_uri,
+    state,
+  } = ctx.request.query;
+
+  let idToken = null;
+  if (typeof id_token_hint === 'string')
+    idToken = await verifyJwt(id_token_hint, 'idToken');
+
+  let redirectUri = 'https://id.caumd.club';
+  if (
+    idToken !== null &&
+    typeof post_logout_redirect_uri === 'string'
+  ) {
+    const client = await db.oauth2Client.findUnique({
+      where: {
+        id: idToken.aud,
+      },
+    });
+    const allowedPostLogoutRedirectUris = client.postLogoutRedirectUris
+      .trim()
+      .split('\n');
+    if (
+      allowedPostLogoutRedirectUris.includes(
+        post_logout_redirect_uri
+      )
+    ) {
+      if (state) {
+        const uriObject = new URL(redirectUri);
+        uriObject.searchParams.append('state', state);
+        redirectUri = uriObject.toString();
+      } else {
+        redirectUri = post_logout_redirect_uri;
+      }
+    }
+  }
+
+  ctx.redirect(
+    'https://id.caumd.club/logout?redirect=' +
+      encodeURIComponent(redirectUri)
+  );
+});
 
 export default router;
