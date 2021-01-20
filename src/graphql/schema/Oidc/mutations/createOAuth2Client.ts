@@ -33,10 +33,28 @@ export const createOAuth2Client = extendType({
             )
           )
         ),
+        postLogoutRedirectUris: list(
+          nonNull(
+            stringArg({
+              description:
+                'RP-Initated Logout 이후 리다이렉트할 uri들',
+            })
+          )
+        ),
+        backchannelLogoutUri: stringArg({
+          description:
+            'Backchannel logout 요청을 받을 주소, null일시 미지원으로 간주',
+        }),
       },
       async resolve(
         _parent,
-        { name, redirectUris, allowedScopes },
+        {
+          name,
+          redirectUris,
+          allowedScopes,
+          postLogoutRedirectUris,
+          backchannelLogoutUri,
+        },
         ctx
       ) {
         const client = await ctx.db.oauth2Client.create({
@@ -45,6 +63,10 @@ export const createOAuth2Client = extendType({
             name,
             redirectUris: redirectUris.join('\n'),
             allowedScopes: allowedScopes.join(' '),
+            postLogoutRedirectUris: postLogoutRedirectUris.join(
+              '\n'
+            ),
+            backchannelLogoutUri,
           },
         });
 

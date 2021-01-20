@@ -18,5 +18,16 @@ export const OAuth2Client = objectType({
     t.nonNull.list.string('allowedScopes', {
       description: '허용된 scope들',
     });
+    t.nonNull.list.nonNull.string(
+      'postLogoutRedirectUris',
+      {
+        description:
+          'RP-Initated Logout이후 리다이렉트할 uri들',
+      }
+    );
+    t.string('backchannelLogoutUri', {
+      description:
+        'Backchannel Logout 요청을 받을 주소, 미지원시 null',
+    });
   },
 });

@@ -34,16 +34,37 @@ export const updateOAuth2Client = extendType({
             stringArg({ description: '허용할 scope들' })
           )
         ),
+        postLogoutRedirectUris: list(
+          nonNull(
+            stringArg({
+              description:
+                'RP-Initated Logout 이후 리다이렉트할 uri들',
+            })
+          )
+        ),
+        backchannelLogoutUri: stringArg({
+          description:
+            'Backchannel logout 요청을 받을 주소, null일시 미지원으로 간주',
+        }),
       },
       async resolve(
         _parent,
-        { id, name, redirectUris, allowedScopes },
+        {
+          id,
+          name,
+          redirectUris,
+          allowedScopes,
+          postLogoutRedirectUris,
+          backchannelLogoutUri,
+        },
         ctx
       ) {
         const data: {
           name?: string;
           redirectUris?: string;
           allowedScopes?: string;
+          postLogoutRedirectUris?: string;
+          backchannelLogoutUri?: string;
         } = {};
 
         if (name !== null) data.name = name;
@@ -51,6 +72,12 @@ export const updateOAuth2Client = extendType({
           data.redirectUris = redirectUris.join('\n');
         if (allowedScopes !== null)
           data.allowedScopes = allowedScopes.join(' ');
+        if (postLogoutRedirectUris !== null)
+          data.postLogoutRedirectUris = postLogoutRedirectUris
+            .filter((i) => i.trim().length !== 0)
+            .join('\n');
+        if (backchannelLogoutUri !== null)
+          data.backchannelLogoutUri = backchannelLogoutUri;
         const client = await ctx.db.oauth2Client.update({
           where: {
             id,

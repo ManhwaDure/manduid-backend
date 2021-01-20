@@ -8,6 +8,8 @@ export const transformOAuth2Client: (
   name: string;
   redirectUris: string[];
   allowedScopes: string[];
+  postLogoutRedirectUris: string[];
+  backchannelLogoutUri: string;
 } = (client) => {
   if (client === null) return null;
   return {
@@ -16,5 +18,9 @@ export const transformOAuth2Client: (
     name: client.name,
     redirectUris: client.redirectUris.split('\n'),
     allowedScopes: client.allowedScopes.split(' '),
+    postLogoutRedirectUris: client.postLogoutRedirectUris.split(
+      '\n'
+    ),
+    backchannelLogoutUri: client.backchannelLogoutUri,
   };
 };
