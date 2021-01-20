@@ -99,7 +99,7 @@ export const createIdToken: createIdTokenFunction = async (
 export const verifyJwt = async (
   jwtString: string,
   jwtType: 'oAuth2Token' | 'idToken'
-) => {
+): Promise<any> => {
   const jwks = await getOidcKeystore();
   if (jwtType == 'oAuth2Token')
     return jwt.verify(jwtString, OAUTH2_JWT_SECRET, {
