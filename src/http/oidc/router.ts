@@ -1,7 +1,7 @@
 import fs from 'fs/promises';
 import { JWKS } from 'jose';
 import Router from 'koa-router';
-import { db } from '~/db';
+import { db } from '../../db';
 import { getOidcKeystore, verifyJwt } from '../../jwt';
 import { BearerTokenError } from '../BearerTokenError';
 import { authenticateToken } from '../oauth2/middlewares';

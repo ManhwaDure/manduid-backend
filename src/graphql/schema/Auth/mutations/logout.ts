@@ -2,7 +2,7 @@ import axios from 'axios';
 import { extendType, nonNull, stringArg } from 'nexus';
 import querystring from 'querystring';
 import randomString from 'random-string';
-import { createIdToken } from '~/jwt';
+import { createIdToken } from '../../../../jwt';
 
 const LogoutMutation = extendType({
   type: 'Mutation',
