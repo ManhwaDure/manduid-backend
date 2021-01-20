@@ -2,70 +2,70 @@
   Warnings:
 
   - The migration will remove the values [sha512] on the enum `SSOUser_hashAlgorithm`. If these variants are still used in the database, the migration will fail.
-  - The migration will change the primary key for the `subscription` table. If it partially fails, the table could be left without primary key constraint.
+  - The migration will change the primary key for the `Subscription` table. If it partially fails, the table could be left without primary key constraint.
 
 */
 -- DropForeignKey
-ALTER TABLE `applicationacceptance` DROP FOREIGN KEY `applicationacceptance_ibfk_2`;
+ALTER TABLE `ApplicationAcceptance` DROP FOREIGN KEY `applicationacceptance_ibfk_2`;
 
 -- DropForeignKey
-ALTER TABLE `applicationacceptance` DROP FOREIGN KEY `applicationacceptance_ibfk_1`;
+ALTER TABLE `ApplicationAcceptance` DROP FOREIGN KEY `applicationacceptance_ibfk_1`;
 
 -- DropForeignKey
-ALTER TABLE `applicationformadditionalanswer` DROP FOREIGN KEY `applicationformadditionalanswer_ibfk_2`;
+ALTER TABLE `ApplicationFormAdditionalAnswer` DROP FOREIGN KEY `applicationformadditionalanswer_ibfk_2`;
 
 -- DropForeignKey
-ALTER TABLE `applicationformadditionalanswer` DROP FOREIGN KEY `applicationformadditionalanswer_ibfk_1`;
+ALTER TABLE `ApplicationFormAdditionalAnswer` DROP FOREIGN KEY `applicationformadditionalanswer_ibfk_1`;
 
 -- DropForeignKey
-ALTER TABLE `graphqlsession` DROP FOREIGN KEY `graphqlsession_ibfk_1`;
+ALTER TABLE `GraphQlSession` DROP FOREIGN KEY `graphqlsession_ibfk_1`;
 
 -- DropForeignKey
-ALTER TABLE `member` DROP FOREIGN KEY `member_ibfk_1`;
+ALTER TABLE `Member` DROP FOREIGN KEY `member_ibfk_1`;
 
 -- DropForeignKey
-ALTER TABLE `member` DROP FOREIGN KEY `member_ibfk_2`;
+ALTER TABLE `Member` DROP FOREIGN KEY `member_ibfk_2`;
 
 -- DropForeignKey
-ALTER TABLE `memberrecordhistory` DROP FOREIGN KEY `memberrecordhistory_ibfk_1`;
+ALTER TABLE `MemberRecordHistory` DROP FOREIGN KEY `memberrecordhistory_ibfk_1`;
 
 -- DropForeignKey
-ALTER TABLE `memberrecordhistory` DROP FOREIGN KEY `memberrecordhistory_ibfk_2`;
+ALTER TABLE `MemberRecordHistory` DROP FOREIGN KEY `memberrecordhistory_ibfk_2`;
 
 -- DropForeignKey
-ALTER TABLE `memberrecordhistory` DROP FOREIGN KEY `memberrecordhistory_ibfk_3`;
+ALTER TABLE `MemberRecordHistory` DROP FOREIGN KEY `memberrecordhistory_ibfk_3`;
 
 -- DropForeignKey
-ALTER TABLE `oauth2authorizationcode` DROP FOREIGN KEY `oauth2authorizationcode_ibfk_1`;
+ALTER TABLE `oauth2AuthorizationCode` DROP FOREIGN KEY `oauth2authorizationcode_ibfk_1`;
 
 -- DropForeignKey
-ALTER TABLE `oauth2authorizationcode` DROP FOREIGN KEY `oauth2authorizationcode_ibfk_2`;
+ALTER TABLE `oauth2AuthorizationCode` DROP FOREIGN KEY `oauth2authorizationcode_ibfk_2`;
 
 -- DropForeignKey
-ALTER TABLE `permission` DROP FOREIGN KEY `permission_ibfk_1`;
+ALTER TABLE `Permission` DROP FOREIGN KEY `permission_ibfk_1`;
 
 -- DropForeignKey
-ALTER TABLE `ssouser` DROP FOREIGN KEY `ssouser_ibfk_1`;
+ALTER TABLE `SSOUser` DROP FOREIGN KEY `ssouser_ibfk_1`;
 
 -- DropForeignKey
-ALTER TABLE `subscription` DROP FOREIGN KEY `subscription_ibfk_1`;
+ALTER TABLE `Subscription` DROP FOREIGN KEY `subscription_ibfk_1`;
 
 -- AlterTable
-ALTER TABLE `code` MODIFY `usage` ENUM('ResendEmailVerification', 'EmailVerification', 'MembershipVerification', 'PasswordRecovery') NOT NULL;
+ALTER TABLE `Code` MODIFY `usage` ENUM('ResendEmailVerification', 'EmailVerification', 'MembershipVerification', 'PasswordRecovery') NOT NULL;
 
 -- AlterTable
-ALTER TABLE `member` MODIFY `memberType` ENUM('AssociateMember', 'RegularMember', 'HonoraryMember', 'Removed', 'Explusion') NOT NULL,
+ALTER TABLE `Member` MODIFY `memberType` ENUM('AssociateMember', 'RegularMember', 'HonoraryMember', 'Removed', 'Explusion') NOT NULL,
     MODIFY `schoolRegisterationStatus` ENUM('Enrolled', 'LeaveOfAbsence', 'MilitaryLeaveOfAbsence', 'Graduated', 'Expelled') NOT NULL;
 
 -- AlterTable
-ALTER TABLE `memberrecordhistory` MODIFY `memberType` ENUM('AssociateMember', 'RegularMember', 'HonoraryMember', 'Removed', 'Explusion') NOT NULL,
+ALTER TABLE `MemberRecordHistory` MODIFY `memberType` ENUM('AssociateMember', 'RegularMember', 'HonoraryMember', 'Removed', 'Explusion') NOT NULL,
     MODIFY `schoolRegisterationStatus` ENUM('Enrolled', 'LeaveOfAbsence', 'MilitaryLeaveOfAbsence', 'Graduated', 'Expelled') NOT NULL;
 
 -- AlterTable
-ALTER TABLE `ssouser` MODIFY `hashAlgorithm` ENUM('sha256', 'bcrypt') NOT NULL;
+ALTER TABLE `SSOUser` MODIFY `hashAlgorithm` ENUM('sha256', 'bcrypt') NOT NULL;
 
 -- AlterTable
-ALTER TABLE `subscription` DROP PRIMARY KEY,
+ALTER TABLE `Subscription` DROP PRIMARY KEY,
     MODIFY `target` ENUM('NewApplicationForm') NOT NULL,
     MODIFY `method` ENUM('Email') NOT NULL,
     ADD PRIMARY KEY (`subscriptorId`, `target`, `method`);
