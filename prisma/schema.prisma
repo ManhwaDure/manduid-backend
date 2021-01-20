@@ -165,12 +165,14 @@ model oauth2Interaction {
 model oauth2AuthorizationCode {
   code String @id @default(cuid())
   clientId String
+  graphQlSessionId String
   nonce String?
   userId String?
   allowedScope String
   expiredAt DateTime
   client oauth2Client @relation(fields: [clientId], references: [id])
   user SSOUser? @relation(fields: [userId], references: [id])
+  graphQlSession GraphQlSession @relation(fields: [graphQlSessionId], references: [id])
 }
 
 enum SubscriptionMethod {
