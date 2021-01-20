@@ -19,6 +19,7 @@ type createIdTokenFunction = (
   options: {
     audienceId: string;
     authenticatedAt: Date;
+    sessionId: string;
     nonce?: string;
   }
 ) => Promise<string>;
@@ -82,6 +83,7 @@ export const createIdToken: createIdTokenFunction = async (
         options.authenticatedAt.getTime() / 1000
       ),
       nonce: options.nonce || undefined,
+      sid: options.sessionId,
     },
     jwks.get({
       use: 'sig',

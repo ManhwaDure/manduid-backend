@@ -7,6 +7,7 @@ export type UserContext = {
   loggedInAt?: Date;
   ssoUserId?: string;
   isPresident?: boolean;
+  sessionId?: string;
   hasPermission: (
     permission: Permission
   ) => Promise<boolean>;

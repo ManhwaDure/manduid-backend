@@ -20,6 +20,7 @@ export default function (
     memberId: member.id,
     ssoUserId: session.ssoUser.id,
     isPresident: member.isPresident,
+    sessionId: session.id,
     hasPermission: async (permission: Permission) => {
       if (member.isPresident) return true;
       else if (member.isExecutive) {

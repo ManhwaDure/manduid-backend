@@ -95,6 +95,23 @@ router.post(
         const token_type = 'Bearer',
           expires_in = 60 * 60;
         if (allowedScopes.includes('openid')) {
+          // Created Oidc Session associated with this id token
+          const {
+            id: sessionId,
+          } = await ctx.db.oidcSession.create({
+            data: {
+              client: {
+                connect: {
+                  id: ctx.oauth2.client.id,
+                },
+              },
+              graphQlSession: {
+                connect: {
+                  id: authorizationCode.graphQlSessionId,
+                },
+              },
+            },
+          });
           // Return with ID Token
           ctx.body = JSON.stringify({
             token_type,
@@ -105,6 +122,7 @@ router.post(
               audienceId: ctx.oauth2.client.id,
               authenticatedAt: new Date(),
               nonce: authorizationCode.nonce,
+              sessionId,
             }),
           });
         } else {

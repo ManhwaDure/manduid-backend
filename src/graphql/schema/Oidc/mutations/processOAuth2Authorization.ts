@@ -157,6 +157,11 @@ export const processOAuth2Authorization = extendType({
                   id: ctx.user.ssoUserId,
                 },
               },
+              graphQlSession: {
+                connect: {
+                  id: ctx.user.sessionId,
+                },
+              },
             },
           }
         );
