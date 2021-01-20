@@ -39,11 +39,11 @@ const LogoutMutation = extendType({
         const backchannelRequests = [];
         for (const oidcSession of session.OidcSession) {
           const {
-            BackchannelLogoutUri,
+            backchannelLogoutUri,
           } = oidcSession.client;
           if (
-            BackchannelLogoutUri !== null &&
-            BackchannelLogoutUri.trim() !== ''
+            backchannelLogoutUri !== null &&
+            backchannelLogoutUri.trim() !== ''
           ) {
             // Create Logout Token
             const logoutToken = await createIdToken(
@@ -62,7 +62,7 @@ const LogoutMutation = extendType({
 
             backchannelRequests.push(
               axios.post(
-                BackchannelLogoutUri,
+                backchannelLogoutUri,
                 querystring.stringify({
                   logout_token: logoutToken,
                 }),
