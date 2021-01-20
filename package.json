@@ -11,6 +11,7 @@
     "@graphql-tools/delegate": "^7.0.8",
     "@prisma/cli": "^2.14.0",
     "@prisma/client": "^2.14.0",
+    "axios": "^0.21.1",
     "bcrypt": "^5.0.0",
     "dotenv-cli": "^4.0.0",
     "ejs": "^3.1.5",

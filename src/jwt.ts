@@ -16,12 +16,23 @@ type createOAuth2TokenFunction = (
 
 type createIdTokenFunction = (
   user: SSOUser,
-  options: {
-    audienceId: string;
-    authenticatedAt: Date;
-    sessionId: string;
-    nonce?: string;
-  }
+  options:
+    | {
+        audienceId: string;
+        authenticatedAt: Date;
+        sessionId: string;
+        nonce?: string;
+        jti?: string;
+        authTime?: boolean;
+        isLogoutToken: false;
+      }
+    | {
+        audienceId: string;
+        sessionId: string;
+        jti: string;
+        authTime: false;
+        isLogoutToken: true;
+      }
 ) => Promise<string>;
 
 const { OAUTH2_JWT_SECRET, OIDC_JWKS_PATH } = process.env;
@@ -79,11 +90,22 @@ export const createIdToken: createIdTokenFunction = async (
   const jwks = await getOidcKeystore();
   return JWT.sign(
     {
-      auth_time: Math.floor(
-        options.authenticatedAt.getTime() / 1000
-      ),
-      nonce: options.nonce || undefined,
+      auth_time:
+        options.authTime !== false
+          ? Math.floor(
+              options.authenticatedAt.getTime() / 1000
+            )
+          : undefined,
+      nonce:
+        options.isLogoutToken === false
+          ? options.nonce || undefined
+          : undefined,
       sid: options.sessionId,
+      events: options.isLogoutToken
+        ? {
+            'https://schemas.openid.net/event/backchannel-logout': {},
+          }
+        : undefined,
     },
     jwks.get({
       use: 'sig',
@@ -94,6 +116,8 @@ export const createIdToken: createIdTokenFunction = async (
       audience: options.audienceId,
       issuer: 'https://id.caumd.club',
       subject: user.id,
+      iat: true,
+      jti: options.jti || undefined,
     }
   );
 };

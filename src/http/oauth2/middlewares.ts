@@ -1,8 +1,8 @@
 import { oauth2Client, PrismaClient } from '@prisma/client';
 import { DefaultState, Middleware } from 'koa';
 import { db } from '../../db';
+import { verifyJwt } from '../../jwt';
 import { BearerTokenError } from '../BearerTokenError';
-import { verifyJwt } from '../jwt';
 import { OAuth2Error } from '../OAuth2Error';
 
 type OAuth2ClientContext = {

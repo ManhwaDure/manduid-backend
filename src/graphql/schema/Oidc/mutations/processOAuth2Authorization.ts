@@ -1,5 +1,5 @@
 import { extendType, nonNull, stringArg } from 'nexus';
-import { verifyJwt } from '../../../../http/jwt';
+import { verifyJwt } from '../../../../jwt';
 
 export const processOAuth2Authorization = extendType({
   type: 'Mutation',

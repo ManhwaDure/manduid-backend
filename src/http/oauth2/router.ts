@@ -5,7 +5,7 @@ import {
   createIdToken,
   createOAuth2Token,
   verifyJwt,
-} from '../jwt';
+} from '../../jwt';
 import { OAuth2Error } from '../OAuth2Error';
 import {
   KoaContext,
@@ -123,6 +123,7 @@ router.post(
               authenticatedAt: new Date(),
               nonce: authorizationCode.nonce,
               sessionId,
+              isLogoutToken: false,
             }),
           });
         } else {

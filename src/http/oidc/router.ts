@@ -2,8 +2,8 @@ import fs from 'fs/promises';
 import { JWKS } from 'jose';
 import Router from 'koa-router';
 import { db } from '~/db';
+import { getOidcKeystore, verifyJwt } from '../../jwt';
 import { BearerTokenError } from '../BearerTokenError';
-import { getOidcKeystore, verifyJwt } from '../jwt';
 import { authenticateToken } from '../oauth2/middlewares';
 import claims from './claims';
 
@@ -28,6 +28,8 @@ router.get('/openid-configuration', async (ctx) => {
     response_modes_supported: ['query'],
     grant_types_supported: ['authorization_code'],
     subject_types_supported: ['public'],
+    backchannel_logout_supported: true,
+    backchannel_logout_session_supported: true,
     id_token_signing_alg_values_supported: keystore
       .all({ use: 'sig' })
       .map((i) => i.algorithms('sign'))
