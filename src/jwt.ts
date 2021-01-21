@@ -124,15 +124,22 @@ export const createIdToken: createIdTokenFunction = async (
 
 export const verifyJwt = async (
   jwtString: string,
-  jwtType: 'oAuth2Token' | 'idToken'
+  jwtType: 'oAuth2Token' | 'idToken',
+  jwtVerificationOptions?: {
+    ignoreExpiration?: boolean;
+  }
 ): Promise<any> => {
   const jwks = await getOidcKeystore();
   if (jwtType == 'oAuth2Token')
     return jwt.verify(jwtString, OAUTH2_JWT_SECRET, {
       issuer: 'https://id.caumd.club',
+      ignoreExpiration:
+        jwtVerificationOptions?.ignoreExpiration || false,
     });
   else
     return JWT.verify(jwtString, jwks, {
       issuer: 'https://id.caumd.club',
+      ignoreExp:
+        jwtVerificationOptions?.ignoreExpiration || false,
     });
 };

@@ -118,7 +118,9 @@ router.get('/end_session', async (ctx) => {
 
   let idToken = null;
   if (typeof id_token_hint === 'string')
-    idToken = await verifyJwt(id_token_hint, 'idToken');
+    idToken = await verifyJwt(id_token_hint, 'idToken', {
+      ignoreExpiration: true,
+    });
 
   let redirectUri = 'https://id.caumd.club';
   if (
