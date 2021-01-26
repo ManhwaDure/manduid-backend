@@ -8,3 +8,4 @@ env/*
 nexus-typegen.ts
 schema.graphql
 test_keys.json
+yarn-error.log
