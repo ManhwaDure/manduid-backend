@@ -1,12 +1,12 @@
 import { gql } from 'graphql-request';
 
 export const membersQuery = gql`
-query membersQuery {
+  query membersQuery {
     members {
-        memberType
-        studentId
-        name
-        department
+      memberType
+      studentId
+      name
+      department
     }
-}
+  }
 `;
