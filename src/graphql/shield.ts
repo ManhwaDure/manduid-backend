@@ -104,6 +104,13 @@ const permissions = shield(
       changePassword: isAuthenticated,
       updateMyProfile: isAuthenticated,
     },
+    Member: {
+      creator: hasPermission('roll.list'),
+      previousRecords: hasPermission('roll.list'),
+    },
+    MemberRecord: {
+      creator: hasPermission('roll.list'),
+    },
   },
   {
     fallbackError: (err) => {
