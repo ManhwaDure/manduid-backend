@@ -62,6 +62,12 @@ export const resendVerificationEmailMutation = extendType({
           },
         });
 
+        await ctx.db.code.delete({
+          where: {
+            code: oldToken.code,
+          },
+        });
+
         const { name, emailAddress } = newToken.data as any;
         await ctx.sendEmail(
           emailAddress,

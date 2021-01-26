@@ -1,7 +1,12 @@
-import { expect } from 'chai';
+import { PrismaClient } from '@prisma/client';
+import chai from 'chai';
+import chaiAsPromised from 'chai-as-promised';
 import request from 'graphql-request';
 import * as dummyServer from './createDummy';
-import { loginMutation } from './gqls';
+import { loginMutation, signUpMutations } from './gqls';
+import { getImapEmail } from './utils';
+chai.use(chaiAsPromised);
+const { expect } = chai;
 
 describe('Authentication', () => {
   let graphQLServerUrl: string,
@@ -14,75 +19,378 @@ describe('Authentication', () => {
     stopServer = result.stop;
   });
 
-  it('Is it able to login with president credentials?', async () => {
-    const data = await request(
-      graphQLServerUrl,
-      loginMutation,
-      dummyServer.testPresidentCredential
-    );
-    expect(data).to.haveOwnProperty('login');
-    expect(data.login).to.haveOwnProperty('success');
-    expect(data.login).to.haveOwnProperty('token');
-    expect(data.login.success).to.equals(true);
-    expect(data.login.token).to.be.a('string');
-    expect(data.login.token).not.to.be.empty;
+  describe('Login', () => {
+    it('Is it able to login with president credentials?', async () => {
+      const data = await request(
+        graphQLServerUrl,
+        loginMutation,
+        dummyServer.testPresidentCredential
+      );
+      expect(data).to.haveOwnProperty('login');
+      expect(data.login).to.haveOwnProperty('success');
+      expect(data.login).to.haveOwnProperty('token');
+      expect(data.login.success).to.equals(true);
+      expect(data.login.token).to.be.a('string');
+      expect(data.login.token).not.to.be.empty;
+    });
+    it('Is it able to prevent login with incorrect president credentials?', async () => {
+      const data = await request(
+        graphQLServerUrl,
+        loginMutation,
+        {
+          id: dummyServer.testPresidentCredential.id,
+          password:
+            dummyServer.testPresidentCredential.password +
+            '123',
+        }
+      );
+      expect(data).to.haveOwnProperty('login');
+      expect(data.login).to.haveOwnProperty('success');
+      expect(data.login).to.haveOwnProperty('token');
+      expect(data.login.success).to.equals(false);
+      expect(data.login.token).to.equals(null);
+    });
+    it('Is it able to prevent login with non-existed id?', async () => {
+      const data = await request(
+        graphQLServerUrl,
+        loginMutation,
+        {
+          id:
+            '_______________________________________________________________NOTEXISTS',
+          password: 'a',
+        }
+      );
+      expect(data).to.haveOwnProperty('login');
+      expect(data.login).to.haveOwnProperty('success');
+      expect(data.login).to.haveOwnProperty('token');
+      expect(data.login.success).to.equals(false);
+      expect(data.login.token).to.equals(null);
+    });
+    it("Is it able to prevent login with removed member's id?", async () => {
+      const data = await request(
+        graphQLServerUrl,
+        loginMutation,
+        dummyServer.testCredentials.Removed
+      );
+      expect(data).to.haveOwnProperty('login');
+      expect(data.login).to.haveOwnProperty('success');
+      expect(data.login).to.haveOwnProperty('token');
+      expect(data.login.success).to.equals(false);
+      expect(data.login.token).to.equals(null);
+    });
+    it("Is it able to prevent login with explused member's id?", async () => {
+      const data = await request(
+        graphQLServerUrl,
+        loginMutation,
+        dummyServer.testCredentials.Explusion
+      );
+      expect(data).to.haveOwnProperty('login');
+      expect(data.login).to.haveOwnProperty('success');
+      expect(data.login).to.haveOwnProperty('token');
+      expect(data.login.success).to.equals(false);
+      expect(data.login.token).to.equals(null);
+    });
   });
-  it('Is it able to prevent login with incorrect president credentials?', async () => {
-    const data = await request(
-      graphQLServerUrl,
-      loginMutation,
-      {
-        id: dummyServer.testPresidentCredential.id,
-        password:
-          dummyServer.testPresidentCredential.password +
-          '123',
-      }
-    );
-    expect(data).to.haveOwnProperty('login');
-    expect(data.login).to.haveOwnProperty('success');
-    expect(data.login).to.haveOwnProperty('token');
-    expect(data.login.success).to.equals(false);
-    expect(data.login.token).to.equals(null);
-  });
-  it('Is it able to prevent login with non-existed id?', async () => {
-    const data = await request(
-      graphQLServerUrl,
-      loginMutation,
-      {
-        id:
-          '_______________________________________________________________NOTEXISTS',
-        password: 'a',
-      }
-    );
-    expect(data).to.haveOwnProperty('login');
-    expect(data.login).to.haveOwnProperty('success');
-    expect(data.login).to.haveOwnProperty('token');
-    expect(data.login.success).to.equals(false);
-    expect(data.login.token).to.equals(null);
-  });
-  it("Is it able to prevent login with removed member's id?", async () => {
-    const data = await request(
-      graphQLServerUrl,
-      loginMutation,
-      dummyServer.testCredentials.Removed
-    );
-    expect(data).to.haveOwnProperty('login');
-    expect(data.login).to.haveOwnProperty('success');
-    expect(data.login).to.haveOwnProperty('token');
-    expect(data.login.success).to.equals(false);
-    expect(data.login.token).to.equals(null);
-  });
-  it("Is it able to prevent login with explused member's id?", async () => {
-    const data = await request(
-      graphQLServerUrl,
-      loginMutation,
-      dummyServer.testCredentials.Explusion
-    );
-    expect(data).to.haveOwnProperty('login');
-    expect(data.login).to.haveOwnProperty('success');
-    expect(data.login).to.haveOwnProperty('token');
-    expect(data.login.success).to.equals(false);
-    expect(data.login.token).to.equals(null);
+  describe('Sign Up', () => {
+    const memberData: dummyServer.MemberTestData = {
+      name: '김계정',
+      phoneNumber: '010-9999-7777',
+      birthday: new Date(2007, 1, 1),
+      creationReason: '',
+      department: '계정생성학과',
+      isPresident: false,
+      memberType: 'RegularMember',
+      schoolRegisterationStatus: 'Enrolled',
+      studentId: 20078765,
+    };
+
+    before('Create test member data', async () => {
+      const prisma = new PrismaClient();
+      await prisma.member.create({
+        data: memberData,
+      });
+    });
+
+    it('Is it unable to sign up with non-existed member?', async () => {
+      const data = await request(
+        graphQLServerUrl,
+        signUpMutations.verifyMembershipMutation,
+        {
+          name: '아아아아아',
+          phoneNumber: '011-9999-7777',
+          studentId: 20008765,
+        }
+      );
+      expect(data).to.haveOwnProperty(
+        'signUp_verifyMembership'
+      );
+      expect(data.signUp_verifyMembership).to.equal(null);
+    });
+
+    it('Does it throw an error when trying to create one more account?', async () => {
+      const {
+        name,
+        phoneNumber,
+        studentId,
+      } = dummyServer.testPresidentMemberData;
+      const verifyMembershipRequest = request(
+        graphQLServerUrl,
+        signUpMutations.verifyMembershipMutation,
+        {
+          name,
+          phoneNumber,
+          studentId,
+        }
+      );
+      expect(verifyMembershipRequest).to.be.eventually
+        .rejected;
+    });
+
+    let membershipVerificationToken;
+    it('Is it able to create membership verification token?', async () => {
+      const { name, phoneNumber, studentId } = memberData;
+      const data = await request(
+        graphQLServerUrl,
+        signUpMutations.verifyMembershipMutation,
+        {
+          name,
+          phoneNumber,
+          studentId,
+        }
+      );
+      expect(data).to.haveOwnProperty(
+        'signUp_verifyMembership'
+      );
+      expect(data.signUp_verifyMembership).to.be.a(
+        'string'
+      );
+      membershipVerificationToken =
+        data.signUp_verifyMembership;
+    });
+
+    const createIdData = {
+      emailAddress: 'somespaghetti@cau.ac.kr',
+      id: 'somespa',
+      password: 'somespa123',
+    };
+    it('Does it throw an error when trying non-cau email', async () => {
+      const { id, password } = createIdData;
+      const createIdRequest = request(
+        graphQLServerUrl,
+        signUpMutations.createIdMutation,
+        {
+          id,
+          password,
+          membershipVerificationToken,
+          emailAddress: 'noncau@example.com',
+        }
+      );
+      expect(createIdRequest).to.eventually.be.rejected;
+    });
+    it('Does it throw an error when trying non-allowed id', async () => {
+      const { emailAddress, password } = createIdData;
+      const createIdRequest = request(
+        graphQLServerUrl,
+        signUpMutations.createIdMutation,
+        {
+          emailAddress,
+          id: '+*_*08Az,.<>',
+          password,
+          membershipVerificationToken,
+        }
+      );
+      expect(createIdRequest).to.eventually.be.rejected;
+    });
+    it('Does it throw an error when trying password shorter than 5 characters?', async () => {
+      const { emailAddress, id } = createIdData;
+      const createIdRequest = request(
+        graphQLServerUrl,
+        signUpMutations.createIdMutation,
+        {
+          emailAddress,
+          id,
+          password: 'abcd',
+          membershipVerificationToken,
+        }
+      );
+      expect(createIdRequest).to.eventually.be.rejected;
+    });
+    it('Does it throw an error when trying wrong membership verification token?', async () => {
+      const { emailAddress, id } = createIdData;
+      const createIdRequest = request(
+        graphQLServerUrl,
+        signUpMutations.createIdMutation,
+        {
+          emailAddress,
+          id,
+          password: 'abcd',
+          membershipVerificationToken:
+            membershipVerificationToken +
+            '_' +
+            membershipVerificationToken +
+            '_0',
+        }
+      );
+      expect(createIdRequest).to.eventually.be.rejected;
+    });
+
+    let resendEmailToken;
+    it('It it able to send id creation request?', async function () {
+      this.timeout(10000);
+      const { emailAddress, id, password } = createIdData;
+      const data = await request(
+        graphQLServerUrl,
+        signUpMutations.createIdMutation,
+        {
+          emailAddress,
+          id,
+          password,
+          membershipVerificationToken,
+        }
+      );
+      expect(data).to.haveOwnProperty('signUp_createId');
+      expect(data.signUp_createId).to.be.a('string');
+      resendEmailToken = data.signUp_createId;
+    });
+
+    let emailVerificationToken;
+    it('Has the verification email arrvied?', function (done) {
+      this.timeout(1000 * 60 * 3);
+      const now = Date.now();
+      const check = async () => {
+        const emails = await getImapEmail();
+        for (const email of emails) {
+          if (
+            email.text.includes(
+              'https://id.caumd.club/verify_email/'
+            ) &&
+            email.html
+              .toString()
+              .includes(
+                'https://id.caumd.club/verify_email/'
+              )
+          ) {
+            emailVerificationToken = decodeURIComponent(
+              /https:\/\/id\.caumd\.club\/verify_email\/([^\s]+)/.exec(
+                email.text
+              )[1]
+            );
+            expect(emailVerificationToken).to.be.a(
+              'string'
+            );
+            expect(emailVerificationToken).not.to.be.empty;
+            done();
+            return;
+          }
+        }
+        if (Date.now() - now < 1000 * 60 * 3)
+          setTimeout(check, 500);
+        else done(new Error('Verification mail not found'));
+      };
+      setImmediate(check);
+    });
+
+    it('Is it able to resend verification email?', async function () {
+      this.timeout(10000);
+      const data = await request(
+        graphQLServerUrl,
+        signUpMutations.resendVerificationEmailMutation,
+        {
+          token: resendEmailToken,
+        }
+      );
+      expect(data).to.haveOwnProperty(
+        'resendVerificationEmail'
+      );
+      expect(data.resendVerificationEmail).to.be.a(
+        'string'
+      );
+      resendEmailToken = data.resendVerificationEmail;
+    });
+
+    let emailVerificationTokenBefore;
+    it('Has the verification email resent?', function (done) {
+      this.timeout(1000 * 60 * 3);
+      emailVerificationTokenBefore = emailVerificationToken;
+      const now = Date.now();
+      const check = async () => {
+        const emails = await getImapEmail();
+        for (const email of emails) {
+          if (
+            email.text.includes(
+              'https://id.caumd.club/verify_email/'
+            ) &&
+            email.html
+              .toString()
+              .includes(
+                'https://id.caumd.club/verify_email/'
+              )
+          ) {
+            emailVerificationToken = decodeURIComponent(
+              /https:\/\/id\.caumd\.club\/verify_email\/([^\s]+)/.exec(
+                email.text
+              )[1]
+            );
+            expect(emailVerificationToken).to.be.a(
+              'string'
+            );
+            expect(emailVerificationToken).not.to.be.empty;
+            expect(emailVerificationToken).not.to.equal(
+              emailVerificationTokenBefore
+            );
+            done();
+            return;
+          }
+        }
+        if (Date.now() - now < 1000 * 60 * 3)
+          setTimeout(check, 500);
+        else done(new Error('Verification mail not found'));
+      };
+      setImmediate(check);
+    });
+
+    it('Is it unable to verify email with invalidated verification token?', async () => {
+      const verifyEmailRequest = request(
+        graphQLServerUrl,
+        signUpMutations.verifyEmailMutation,
+        {
+          verificationToken: emailVerificationTokenBefore,
+        }
+      );
+      expect(verifyEmailRequest).to.eventually.be.rejected;
+    });
+
+    it('Is it able to verify email with valid verification token?', async () => {
+      const data = await request(
+        graphQLServerUrl,
+        signUpMutations.verifyEmailMutation,
+        {
+          verificationToken: emailVerificationToken,
+        }
+      );
+      expect(data).to.haveOwnProperty('signUp_verifyEmail');
+      expect(data.signUp_verifyEmail).to.be.a('string');
+      expect(data.signUp_verifyEmail).to.equal(
+        createIdData.id
+      );
+    });
+
+    it('Is it able to login with created account?', async () => {
+      const { id, password } = createIdData;
+      const data = await request(
+        graphQLServerUrl,
+        loginMutation,
+        {
+          id,
+          password,
+        }
+      );
+      expect(data).to.haveOwnProperty('login');
+      expect(data.login).to.haveOwnProperty('success');
+      expect(data.login).to.haveOwnProperty('token');
+      expect(data.login.success).to.equals(true);
+      expect(data.login.token).to.be.a('string');
+    });
   });
 
   after('Close dummy server', async function () {

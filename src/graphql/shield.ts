@@ -113,6 +113,9 @@ const permissions = shield(
     },
   },
   {
+    debug: ['development', 'debug', 'test'].some((i) =>
+      process.env.NODE_ENV.trim().toLowerCase().includes(i)
+    ),
     fallbackError: (err) => {
       if (err instanceof GraphQLExposableError) {
         return err;

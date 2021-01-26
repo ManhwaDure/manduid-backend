@@ -9,6 +9,17 @@ yarn prisma-generate
 yarn build
 ```
 
+## Testing
+To run all tests, see below.
+```bash
+yarn test
+```
+
+If you want to test only some specified tests, see below.
+```bash
+yarn test-for test/auth.test.ts
+```
+
 ## env files
 - `/env/.env.test` : for test
 - `/env/.env.dev` : for development

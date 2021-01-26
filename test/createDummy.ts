@@ -1,7 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcrypt';
 import { spawn } from 'child_process';
-import getPort from 'get-port';
 import request, { GraphQLClient } from 'graphql-request';
 import graphqlServer from '../src/graphql/server';
 import httpServer from '../src/http';
@@ -226,8 +225,8 @@ export const createDummy: () => Promise<{
 
             // Run server
             const [graphQlServerPort, httpServerPort] = [
-              await getPort(),
-              await getPort(),
+              parseInt(process.env.GRAPHQL_PORT),
+              parseInt(process.env.HTTP_PORT),
             ];
             const unwrappedGraphQLServer = await graphqlServer.start(
               { port: graphQlServerPort, endpoint: '/' }
