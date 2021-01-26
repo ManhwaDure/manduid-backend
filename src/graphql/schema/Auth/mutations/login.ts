@@ -27,6 +27,9 @@ export const LoginMutation = extendType({
           where: {
             id,
           },
+          include: {
+            member: true,
+          },
         });
 
         if (user === null)
@@ -67,6 +70,18 @@ export const LoginMutation = extendType({
           }
         }
         if (success) {
+          if (user.member.memberType === 'Explusion')
+            return {
+              success: false,
+              errorMessage:
+                '탈퇴 및 제적처리된 회원입니다. 재입부 신청해주시거나 회장단에게 문의해주세요.',
+            };
+          else if (user.member.memberType === 'Removed')
+            return {
+              success: false,
+              errorMessage:
+                '제명된 회원입니다. 회장단에게 문의해주세요.',
+            };
           const token = (
             await ctx.db.graphQlSession.create({
               data: {
