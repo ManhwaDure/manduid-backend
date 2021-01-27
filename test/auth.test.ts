@@ -1,22 +1,28 @@
 import { PrismaClient } from '@prisma/client';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import request from 'graphql-request';
+import request, { GraphQLClient } from 'graphql-request';
 import * as dummyServer from './createDummy';
-import { loginMutation, signUpMutations } from './gqls';
+import {
+  changePasswordMutation,
+  loginMutation,
+  signUpMutations,
+} from './gqls';
 import { getImapEmail } from './utils';
 chai.use(chaiAsPromised);
 const { expect } = chai;
 
 describe('Authentication', () => {
   let graphQLServerUrl: string,
-    stopServer: () => Promise<void>;
+    stopServer: () => Promise<void>,
+    presidentClient: GraphQLClient;
   before('Create dummy data', async function () {
     this.timeout(60000);
     const result = await dummyServer.createDummy();
     graphQLServerUrl =
       'http://127.0.0.1:' + result.graphQlServerPort;
     stopServer = result.stop;
+    presidentClient = await result.createPresidentalClient();
   });
 
   describe('Login', () => {
@@ -390,6 +396,73 @@ describe('Authentication', () => {
       expect(data.login).to.haveOwnProperty('token');
       expect(data.login.success).to.equals(true);
       expect(data.login.token).to.be.a('string');
+    });
+  });
+  describe('Update', () => {
+    it('Is it unable to change password when entered incorrect password?', async () => {
+      const {
+        password: oldPassword,
+      } = dummyServer.testPresidentCredential;
+      const changePasswordRequest = presidentClient.request(
+        changePasswordMutation,
+        {
+          oldPassword: oldPassword + '_',
+          newPassword: oldPassword + '_' + oldPassword,
+        }
+      );
+
+      expect(changePasswordRequest).to.eventually.be
+        .rejected;
+    });
+    it('Is it unable to change password with new password shorter than 5 characters?', async () => {
+      const {
+        password: oldPassword,
+      } = dummyServer.testPresidentCredential;
+      const changePasswordRequest = presidentClient.request(
+        changePasswordMutation,
+        {
+          oldPassword,
+          newPassword: 'abcd',
+        }
+      );
+
+      expect(changePasswordRequest).to.eventually.be
+        .rejected;
+    });
+    it('Is it able to change password?', async () => {
+      const {
+        password: oldPassword,
+      } = dummyServer.testPresidentCredential;
+
+      const data = await presidentClient.request(
+        changePasswordMutation,
+        {
+          oldPassword,
+          newPassword: oldPassword + '_123',
+        }
+      );
+
+      expect(data).to.haveOwnProperty('changePassword');
+      expect(data.changePassword).to.equal(true);
+    });
+    it('Is it able to login with new password?', async () => {
+      const data = await request(
+        graphQLServerUrl,
+        loginMutation,
+        {
+          id: dummyServer.testPresidentCredential.id,
+          password:
+            dummyServer.testPresidentCredential.password +
+            '_123',
+        }
+      );
+
+      expect(data).to.haveOwnProperty('login');
+      expect(data.login).to.haveOwnProperty('success');
+      expect(data.login).to.haveOwnProperty('token');
+      expect(data.login.success).to.equal(true);
+      expect(data.login.token).to.be.a('string');
+      expect(data.login.token).not.to.be.empty;
     });
   });
 
