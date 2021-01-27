@@ -5,7 +5,9 @@ import request, { GraphQLClient } from 'graphql-request';
 import * as dummyServer from './createDummy';
 import {
   changePasswordMutation,
+  forgotPasswordMutation,
   loginMutation,
+  resetPasswordMutation,
   signUpMutations,
 } from './gqls';
 import { getImapEmail } from './utils';
@@ -398,7 +400,7 @@ describe('Authentication', () => {
       expect(data.login.token).to.be.a('string');
     });
   });
-  describe('Update', () => {
+  describe('Change password', () => {
     it('Is it unable to change password when entered incorrect password?', async () => {
       const {
         password: oldPassword,
@@ -454,6 +456,131 @@ describe('Authentication', () => {
           password:
             dummyServer.testPresidentCredential.password +
             '_123',
+        }
+      );
+
+      expect(data).to.haveOwnProperty('login');
+      expect(data.login).to.haveOwnProperty('success');
+      expect(data.login).to.haveOwnProperty('token');
+      expect(data.login.success).to.equal(true);
+      expect(data.login.token).to.be.a('string');
+      expect(data.login.token).not.to.be.empty;
+    });
+  });
+  describe('Reset password', () => {
+    it('Is it unable to reset password with non-existed email?', async () => {
+      const data = await request(
+        graphQLServerUrl,
+        forgotPasswordMutation,
+        {
+          emailAddress: '____NONEXISTSED____@cau.ac.kr',
+        }
+      );
+
+      expect(data).to.haveOwnProperty('forgotPassword');
+      expect(data.forgotPassword).to.equal(false);
+    });
+    it('Is it able to send forgot-password mail?', async function () {
+      this.timeout(1000 * 10);
+      const data = await request(
+        graphQLServerUrl,
+        forgotPasswordMutation,
+        {
+          emailAddress:
+            dummyServer.testMemberEmails.RegularMember,
+        }
+      );
+
+      expect(data).to.haveOwnProperty('forgotPassword');
+      expect(data.forgotPassword).to.equal(true);
+    });
+
+    let resetToken: string;
+    it('Has password-reset token arrived?', function (done) {
+      this.timeout(1000 * 12);
+      const repeatUntil = Date.now() + 1000 * 10;
+      const check = async () => {
+        if (Date.now() >= repeatUntil)
+          return done(
+            new Error('Password-reset mail not found')
+          );
+
+        const mails = await getImapEmail();
+        for (const mail of mails) {
+          if (
+            mail.text.includes(
+              'https://id.caumd.club/reset_password/'
+            ) &&
+            mail.html
+              .toString()
+              .includes(
+                'https://id.caumd.club/reset_password/'
+              )
+          ) {
+            resetToken = decodeURIComponent(
+              /https:\/\/id\.caumd\.club\/reset_password\/([^\s]+)/.exec(
+                mail.text
+              )[1]
+            );
+            return done();
+          }
+        }
+        if (Date.now() < repeatUntil) {
+          setTimeout(check, 500);
+        }
+      };
+      setImmediate(check);
+    });
+
+    const newPassword =
+      dummyServer.testCredentials.RegularMember +
+      '_changed';
+    it('Is it unable to reset password with incorrect token?', async () => {
+      const data = await request(
+        graphQLServerUrl,
+        resetPasswordMutation,
+        {
+          resetToken: resetToken + '_' + resetToken,
+          newPassword,
+        }
+      );
+
+      expect(data).to.haveOwnProperty('resetPassword');
+      expect(data.resetPassword).to.equal(false);
+    });
+    it('Is it unable to reset password to passwrod shorter than 5 characters?', async () => {
+      const resetPasswordRequest = request(
+        graphQLServerUrl,
+        resetPasswordMutation,
+        {
+          resetToken,
+          newPassword: 'abcd',
+        }
+      );
+
+      expect(resetPasswordRequest).to.eventually.be
+        .rejected;
+    });
+    it('Is it able to reset password with token?', async () => {
+      const data = await request(
+        graphQLServerUrl,
+        resetPasswordMutation,
+        {
+          resetToken,
+          newPassword,
+        }
+      );
+
+      expect(data).to.haveOwnProperty('resetPassword');
+      expect(data.resetPassword).to.equal(true);
+    });
+    it('Is it able to login with new password?', async () => {
+      const data = await request(
+        graphQLServerUrl,
+        loginMutation,
+        {
+          id: dummyServer.testCredentials.RegularMember.id,
+          password: newPassword,
         }
       );
 
