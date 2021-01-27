@@ -137,6 +137,15 @@ export const testMemberDatas: {
     isPresident: false,
   },
 };
+export const testMemberEmails: {
+  [key in memberTypeEnum]: string;
+} = {
+  AssociateMember: 'testass@cau.ac.kr',
+  Explusion: 'expired_one@cau.ac.kr',
+  HonoraryMember: 'honor@cau.ac.kr',
+  RegularMember: 'irregular@cau.ac.kr',
+  Removed: 'dust_remover@cau.ac.kr',
+};
 export const createDummy: () => Promise<{
   presidentMemberId: number;
   graphQlServerPort: number;
@@ -187,7 +196,7 @@ export const createDummy: () => Promise<{
               data: {
                 hashAlgorithm: 'bcrypt',
                 id: 'president',
-                emailAddress: 'example@example.com',
+                emailAddress: 'example@cau.ac.kr',
                 member: {
                   connect: {
                     id: presidentMemberId,
@@ -209,7 +218,7 @@ export const createDummy: () => Promise<{
                 data: {
                   hashAlgorithm: 'bcrypt',
                   id: testCredentials[i].id,
-                  emailAddress: `test${i}@example.com`,
+                  emailAddress: testMemberEmails[i],
                   member: {
                     connect: {
                       id: member.id,
