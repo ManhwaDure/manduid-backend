@@ -9,6 +9,7 @@ import {
   loginMutation,
   resetPasswordMutation,
   signUpMutations,
+  updateMyProfileMutation,
 } from './gqls';
 import { getImapEmail } from './utils';
 chai.use(chaiAsPromised);
@@ -398,6 +399,41 @@ describe('Authentication', () => {
       expect(data.login).to.haveOwnProperty('token');
       expect(data.login.success).to.equals(true);
       expect(data.login.token).to.be.a('string');
+    });
+  });
+  describe('Profile', () => {
+    const profile = {
+      introduction: 'TTTTTT',
+      website: 'http://example.com',
+      nickname: 'PresiPreszi',
+    };
+    it('Is it able to udpate my profile?', async () => {
+      const data = await presidentClient.request(
+        updateMyProfileMutation,
+        {
+          profile,
+        }
+      );
+
+      expect(data).to.haveOwnProperty('updateMyProfile');
+      expect(data.updateMyProfile).to.haveOwnProperty(
+        'introduction'
+      );
+      expect(data.updateMyProfile).to.haveOwnProperty(
+        'website'
+      );
+      expect(data.updateMyProfile).to.haveOwnProperty(
+        'nickname'
+      );
+      expect(data.updateMyProfile.introduction).to.equal(
+        profile.introduction
+      );
+      expect(data.updateMyProfile.website).to.equal(
+        profile.website
+      );
+      expect(data.updateMyProfile.nickname).to.equal(
+        profile.nickname
+      );
     });
   });
   describe('Change password', () => {

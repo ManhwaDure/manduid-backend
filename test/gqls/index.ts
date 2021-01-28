@@ -8,3 +8,4 @@ export * from './membersQuery';
 export * from './membersQueryWithPrevRecords';
 export * from './resetPasswordMutation';
 export * as signUpMutations from './signUpMutations';
+export * from './updateMyProfileMutation';
