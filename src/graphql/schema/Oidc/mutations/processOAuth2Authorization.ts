@@ -263,19 +263,15 @@ export const processOAuth2Authorization = extendType({
                 nonce,
                 sessionId,
                 isLogoutToken: false,
-              });
-
-              // Include userinfo if no access token is requested
-              if (response_type === 'id_token')
-                Object.assign(
-                  id_token,
-                  await claims(
+                claims:
+                  response_type === 'id_token' &&
+                  (await claims(
                     user,
                     getAvailableClaimsByScopes(
                       scopesRequested
                     )
-                  )
-                );
+                  )),
+              });
 
               // Encode as fragment
               const encodedFragment = querystring.encode(

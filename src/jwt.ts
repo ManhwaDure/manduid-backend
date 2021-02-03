@@ -24,6 +24,7 @@ type createIdTokenFunction = (
         nonce?: string;
         jti?: string;
         authTime?: boolean;
+        claims?: any;
         isLogoutToken: false;
       }
     | {
@@ -88,25 +89,28 @@ export const createIdToken: createIdTokenFunction = async (
   options
 ) => {
   const jwks = await getOidcKeystore();
-  return JWT.sign(
-    {
-      auth_time:
-        options.authTime !== false
-          ? Math.floor(
-              options.authenticatedAt.getTime() / 1000
-            )
-          : undefined,
-      nonce:
-        options.isLogoutToken === false
-          ? options.nonce || undefined
-          : undefined,
-      sid: options.sessionId,
-      events: options.isLogoutToken
-        ? {
-            'https://schemas.openid.net/event/backchannel-logout': {},
-          }
+  const objToSign = {
+    auth_time:
+      options.authTime !== false
+        ? Math.floor(
+            options.authenticatedAt.getTime() / 1000
+          )
         : undefined,
-    },
+    nonce:
+      options.isLogoutToken === false
+        ? options.nonce || undefined
+        : undefined,
+    sid: options.sessionId,
+    events: options.isLogoutToken
+      ? {
+          'https://schemas.openid.net/event/backchannel-logout': {},
+        }
+      : undefined,
+  };
+  if (options.isLogoutToken === false && options.claims)
+    Object.assign(objToSign, options.claims);
+  return JWT.sign(
+    objToSign,
     jwks.get({
       use: 'sig',
     }),
