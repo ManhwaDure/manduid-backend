@@ -3,8 +3,8 @@ import {
   PrismaClient,
   SSOUser,
 } from '@prisma/client';
+import { permissionDescriptions } from '../../graphql/schema/Executive/queries/permissionDescriptions';
 import getAvatarUrl from '../../graphql/schema/Member/getAvatarUrl';
-import { permissionDescription } from '../../graphql/schema/types';
 
 const db = new PrismaClient();
 
@@ -28,7 +28,7 @@ export default async function (
   let permissions: string[] = [];
   if (user.member.isExecutive || user.member.isPresident) {
     const allPermissions = Object.keys(
-      permissionDescription
+      permissionDescriptions
     );
     const grantedPermissions = user.member.isPresident
       ? ['root']
@@ -47,7 +47,7 @@ export default async function (
         (i) =>
           grantedPermissions.includes(i) ||
           grantedPermissions.some((j) =>
-            j.startsWith(i + '.')
+            i.startsWith(j + '.')
           )
       );
       permissions = permissions.reduce((prev, cur) => {
@@ -62,8 +62,8 @@ export default async function (
     nickname,
     website,
     email,
-    email_verifited: true,
-    picture: getAvatarUrl(user.id, db),
+    email_verified: true,
+    picture: await getAvatarUrl(user.id, db),
     birthdate: dateToDateString(user.member.birthday),
     zoneinfo: 'Asia/Seoul',
     locale: 'ko_KR',

@@ -4,7 +4,7 @@ import md5 from 'md5';
 export default async (
   ssoUserId: string,
   db: PrismaClient
-) => {
+): Promise<string> => {
   const user = await db.sSOUser.findUnique({
     where: {
       id: ssoUserId,

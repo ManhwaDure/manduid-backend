@@ -87,7 +87,7 @@ export const Member = objectType({
         });
 
         if (ssouser)
-          return getAvatarUrl(ssouser.id, ctx.db);
+          return await getAvatarUrl(ssouser.id, ctx.db);
         else return null;
       },
     });
