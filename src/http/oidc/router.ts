@@ -24,7 +24,11 @@ router.get('/openid-configuration', async (ctx) => {
     userinfo_endpoint: createUrl('/userinfo'),
     jwks_uri: createUrl('/jwks'),
     scopes_supported: ['openid'],
-    response_types_supported: ['code'],
+    response_types_supported: [
+      'code',
+      'id_token',
+      'token id_token',
+    ],
     response_modes_supported: ['query'],
     grant_types_supported: ['authorization_code'],
     subject_types_supported: ['public'],

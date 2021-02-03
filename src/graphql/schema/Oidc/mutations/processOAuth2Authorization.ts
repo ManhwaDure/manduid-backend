@@ -1,5 +1,10 @@
 import { extendType, nonNull, stringArg } from 'nexus';
-import { verifyJwt } from '../../../../jwt';
+import querystring from 'querystring';
+import {
+  createIdToken,
+  createOAuth2Token,
+  verifyJwt,
+} from '../../../../jwt';
 import { GraphQLExposableError } from '../../../exposableError';
 
 export const processOAuth2Authorization = extendType({
@@ -67,13 +72,6 @@ export const processOAuth2Authorization = extendType({
             'Redirect_uri이 올바르지 않습니다.'
           );
 
-        // Support only authorization code grant
-        if (response_type !== 'code')
-          return (
-            redirect_uri +
-            '?error=invalid_request&error_description=unsupported_response_type'
-          );
-
         // Verify scope
         const scopesRequested = scope.split(
           ' '
@@ -92,8 +90,22 @@ export const processOAuth2Authorization = extendType({
         const openIdRequested = scopesRequested.includes(
           'openid'
         );
+
+        // require nonce if implicit flow
+        if (
+          openIdRequested &&
+          (response_type === 'id_token token' ||
+            response_type === 'id_token') &&
+          typeof nonce !== 'string'
+        ) {
+          return (
+            redirect_uri +
+            '?error=invalid_request&error_description=nonce_required_for_implicit_flow'
+          );
+        }
+
+        // Process Prompt, with support of "none" only
         if (openIdRequested) {
-          // Process Prompt, with support of "none" only
           if (prompt) {
             const prompts = prompt.split(' ') as string[];
             if (prompts.includes('none')) {
@@ -144,53 +156,138 @@ export const processOAuth2Authorization = extendType({
           }
         }
 
-        const code = await ctx.db.oauth2AuthorizationCode.create(
-          {
-            data: {
-              allowedScope: scopesRequested.join(' '),
-              client: {
-                connect: {
-                  id: client_id,
+        switch (response_type) {
+          case 'code': {
+            const code = await ctx.db.oauth2AuthorizationCode.create(
+              {
+                data: {
+                  allowedScope: scopesRequested.join(' '),
+                  client: {
+                    connect: {
+                      id: client_id,
+                    },
+                  },
+                  expiredAt: new Date(
+                    Date.now() + 60 * 60 * 1000
+                  ),
+                  nonce,
+                  user: {
+                    connect: {
+                      id: ctx.user.ssoUserId,
+                    },
+                  },
+                  graphQlSession: {
+                    connect: {
+                      id: ctx.user.sessionId,
+                    },
+                  },
                 },
+              }
+            );
+
+            await ctx.db.oauth2Interaction.delete({
+              where: {
+                id: interactionId,
               },
-              expiredAt: new Date(
-                Date.now() + 60 * 60 * 1000
-              ),
-              nonce,
-              user: {
-                connect: {
-                  id: ctx.user.ssoUserId,
-                },
-              },
-              graphQlSession: {
-                connect: {
-                  id: ctx.user.sessionId,
-                },
-              },
-            },
+            });
+
+            if (state)
+              return (
+                redirect_uri +
+                '?code=' +
+                encodeURIComponent(code.code) +
+                '&state=' +
+                encodeURIComponent(state)
+              );
+            else
+              return (
+                redirect_uri +
+                '?code=' +
+                encodeURIComponent(code.code)
+              );
           }
-        );
+          case 'id_token token':
+          case 'id_token': {
+            const { access_token } = createOAuth2Token(
+              client_id,
+              {
+                userId: ctx.user.ssoUserId,
+                scopes: scopesRequested,
+              }
+            );
+            const token_type = 'Bearer',
+              expires_in = 60 * 60;
 
-        await ctx.db.oauth2Interaction.delete({
-          where: {
-            id: interactionId,
-          },
-        });
+            let result;
+            if (scopesRequested.includes('openid')) {
+              // Created Oidc Session associated with this id token
+              const {
+                id: sessionId,
+              } = await ctx.db.oidcSession.create({
+                data: {
+                  client: {
+                    connect: {
+                      id: client_id,
+                    },
+                  },
+                  graphQlSession: {
+                    connect: {
+                      id: ctx.user.sessionId,
+                    },
+                  },
+                },
+              });
 
-        if (state)
-          return (
-            redirect_uri +
-            '?code=' +
-            encodeURIComponent(code.code) +
-            '&state=' +
-            encodeURIComponent(state)
-          );
-        else
-          return (
-            redirect_uri +
-            '?code=' +
-            encodeURIComponent(code.code)
-          );
+              const id_token = await createIdToken(
+                await ctx.db.sSOUser.findUnique({
+                  where: { id: ctx.user.ssoUserId },
+                }),
+                {
+                  audienceId: client_id,
+                  authenticatedAt: new Date(),
+                  nonce,
+                  sessionId,
+                  isLogoutToken: false,
+                }
+              );
+              // Return with ID Token
+
+              const encodedFragment = querystring.encode(
+                response_type.endsWith(' token')
+                  ? {
+                      access_token,
+                      token_type,
+                      id_token,
+                      state,
+                      expires_in,
+                    }
+                  : {
+                      id_token,
+                      state,
+                      expires_in,
+                    }
+              );
+
+              result = redirect_uri + '#' + encodedFragment;
+            } else {
+              result =
+                redirect_uri +
+                '?error=invalid_request&id_token_response_type_without_openid_scope';
+            }
+            await ctx.db.oauth2Interaction.delete({
+              where: {
+                id: interactionId,
+              },
+            });
+            return result;
+          }
+          default: {
+            return (
+              redirect_uri +
+              '?error=invalid_request&error_description=unsupported_response_type'
+            );
+          }
+        }
       },
     });
   },
