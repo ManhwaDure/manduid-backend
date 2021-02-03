@@ -4,6 +4,7 @@ import {
   SSOUser,
 } from '@prisma/client';
 import getAvatarUrl from '../../graphql/schema/Member/getAvatarUrl';
+import { permissionDescription } from '../../graphql/schema/types';
 
 const db = new PrismaClient();
 
@@ -24,6 +25,37 @@ export default async function (
   neededClaims: string[]
 ) {
   const { nickname, website, emailAddress: email } = user;
+  let permissions: string[] = [];
+  if (user.member.isExecutive || user.member.isPresident) {
+    const allPermissions = Object.keys(
+      permissionDescription
+    );
+    const grantedPermissions = user.member.isPresident
+      ? ['root']
+      : (
+          await db.permission.findMany({
+            where: {
+              executiveTypeName:
+                user.member.executiveTypeName,
+            },
+          })
+        ).map((i) => i.permission);
+    if (grantedPermissions.includes('root')) {
+      permissions = allPermissions;
+    } else {
+      permissions = allPermissions.filter(
+        (i) =>
+          grantedPermissions.includes(i) ||
+          grantedPermissions.some((j) =>
+            j.startsWith(i + '.')
+          )
+      );
+      permissions = permissions.reduce((prev, cur) => {
+        if (!prev.includes(cur)) prev.push(cur);
+        return prev;
+      }, []);
+    }
+  }
   const claims = {
     sub: user.id,
     name: user.member.name,
@@ -36,6 +68,8 @@ export default async function (
     zoneinfo: 'Asia/Seoul',
     locale: 'ko_KR',
     phone_number: user.member.phoneNumber,
+    permissions,
+    president: user.member.isPresident,
   };
 
   const result: any = {};

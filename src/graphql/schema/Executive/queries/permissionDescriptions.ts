@@ -1,7 +1,9 @@
 import { extendType } from 'nexus';
 import { Permission } from '../../../context/permissions';
 
-const descriptions: { [key in Permission]: string } = {
+export const permissionDescriptions: {
+  [key in Permission]: string;
+} = {
   application: '입부/재입부원서에 관한 모든 권한',
   'application.accept':
     '입부/재입부원서를 승인할 수 있는 권한',
@@ -65,11 +67,13 @@ export const PermissionsQuery = extendType({
         '모든 시스템 권한들에 대한 설명을 가져옵니다.',
       resolve(_parent, args, ctx) {
         const result = [];
-        for (const permission in descriptions) {
+        for (const permission in permissionDescriptions) {
           result.push({
             name: permission,
             description:
-              descriptions[permission as Permission],
+              permissionDescriptions[
+                permission as Permission
+              ],
           });
         }
         return result;
