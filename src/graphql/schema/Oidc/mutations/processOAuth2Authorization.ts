@@ -1,5 +1,7 @@
 import { extendType, nonNull, stringArg } from 'nexus';
 import querystring from 'querystring';
+import claims from '../../../../http/oidc/claims';
+import { getAvailableClaimsByScopes } from '../../../../http/oidc/filterClaimsByScopes';
 import {
   createIdToken,
   createOAuth2Token,
@@ -238,20 +240,36 @@ export const processOAuth2Authorization = extendType({
                 },
               });
 
-              const id_token = await createIdToken(
-                await ctx.db.sSOUser.findUnique({
-                  where: { id: ctx.user.ssoUserId },
-                }),
-                {
-                  audienceId: client_id,
-                  authenticatedAt: new Date(),
-                  nonce,
-                  sessionId,
-                  isLogoutToken: false,
-                }
-              );
-              // Return with ID Token
+              // Query user
+              const user = await ctx.db.sSOUser.findUnique({
+                where: { id: ctx.user.ssoUserId },
+                include: {
+                  member: true,
+                },
+              });
 
+              // Create Id Token
+              const id_token = await createIdToken(user, {
+                audienceId: client_id,
+                authenticatedAt: new Date(),
+                nonce,
+                sessionId,
+                isLogoutToken: false,
+              });
+
+              // Include userinfo if no access token is requested
+              if (response_type === 'id_token')
+                Object.assign(
+                  id_token,
+                  await claims(
+                    user,
+                    getAvailableClaimsByScopes(
+                      scopesRequested
+                    )
+                  )
+                );
+
+              // Encode as fragment
               const encodedFragment = querystring.encode(
                 response_type.endsWith(' token')
                   ? {
