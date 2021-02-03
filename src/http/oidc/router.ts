@@ -6,6 +6,7 @@ import { getOidcKeystore, verifyJwt } from '../../jwt';
 import { BearerTokenError } from '../BearerTokenError';
 import { authenticateToken } from '../oauth2/middlewares';
 import claims from './claims';
+import { getAvailableClaimsByScopes } from './filterClaimsByScopes';
 
 const createUrl = (url = '') => {
   const { HTTP_API_ENDPOINT } = process.env;
@@ -59,43 +60,12 @@ router.get(
   '/userinfo',
   authenticateToken({ requiredScopes: ['openid'] }),
   async (ctx) => {
-    let availableClaims: string[] = [];
     if (ctx.oauth2.token.user === null)
       throw new BearerTokenError('invalid_token');
     const allowedScopes = ctx.oauth2.token.scopes;
-    if (allowedScopes.includes('profile')) {
-      availableClaims = availableClaims.concat([
-        'name',
-        'family_name',
-        'given_name',
-        'middle_name',
-        'nickname',
-        'preferred_username',
-        'profile',
-        'picture',
-        'website',
-        'gender',
-        'birthdate',
-        'zoneinfo',
-        'locale',
-        'updated_at',
-      ]);
-    }
-    if (allowedScopes.includes('email')) {
-      availableClaims = availableClaims.concat([
-        'email',
-        'email_verified',
-      ]);
-    }
-    if (allowedScopes.includes('address')) {
-      availableClaims = availableClaims.concat(['address']);
-    }
-    if (allowedScopes.includes('phone')) {
-      availableClaims = availableClaims.concat([
-        'phone_number',
-        'phone_number_verified',
-      ]);
-    }
+    const availableClaims: string[] = getAvailableClaimsByScopes(
+      allowedScopes
+    );
 
     const userinfo: any = await claims(
       await ctx.db.sSOUser.findUnique({
