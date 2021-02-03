@@ -155,6 +155,7 @@ model oauth2Client {
   name String
   redirectUris String
   allowedScopes String
+  defaultAddedScopes String
   postLogoutRedirectUris String
   backchannelLogoutUri String?
 }
