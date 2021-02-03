@@ -74,10 +74,19 @@ export const processOAuth2Authorization = extendType({
             'Redirect_uri이 올바르지 않습니다.'
           );
 
-        // Verify scope
+        // Parse scope into array
         const scopesRequested = scope.split(
           ' '
         ) as string[];
+
+        // Insert defaultAddedScope into scope array
+        for (const i of client.defaultAddedScopes.split(
+          ' '
+        ))
+          if (!scopesRequested.includes(i))
+            scopesRequested.push(i);
+
+        // Verify scope
         if (
           scopesRequested.some(
             (i) =>
@@ -88,7 +97,6 @@ export const processOAuth2Authorization = extendType({
             redirect_uri +
             '?error=invalid_request&error_description=invalid_redirect_uri'
           );
-
         const openIdRequested = scopesRequested.includes(
           'openid'
         );
