@@ -42,6 +42,14 @@ export const updateOAuth2Client = extendType({
             })
           )
         ),
+        defaultAddedScopes: list(
+          nonNull(
+            stringArg({
+              description:
+                '요청하지 않아도 자동으로 추가되는 scope들',
+            })
+          )
+        ),
         backchannelLogoutUri: stringArg({
           description:
             'Backchannel logout 요청을 받을 주소, null일시 미지원으로 간주',
@@ -56,6 +64,7 @@ export const updateOAuth2Client = extendType({
           allowedScopes,
           postLogoutRedirectUris,
           backchannelLogoutUri,
+          defaultAddedScopes,
         },
         ctx
       ) {
@@ -65,6 +74,7 @@ export const updateOAuth2Client = extendType({
           allowedScopes?: string;
           postLogoutRedirectUris?: string;
           backchannelLogoutUri?: string;
+          defaultAddedScopes?: string;
         } = {};
 
         if (name !== null) data.name = name;
@@ -78,6 +88,10 @@ export const updateOAuth2Client = extendType({
             .join('\n');
         if (backchannelLogoutUri !== null)
           data.backchannelLogoutUri = backchannelLogoutUri;
+        if (defaultAddedScopes !== null)
+          data.defaultAddedScopes = defaultAddedScopes.join(
+            ' '
+          );
         const client = await ctx.db.oauth2Client.update({
           where: {
             id,

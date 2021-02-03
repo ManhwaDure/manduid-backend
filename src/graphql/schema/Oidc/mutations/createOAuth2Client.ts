@@ -33,12 +33,24 @@ export const createOAuth2Client = extendType({
             )
           )
         ),
-        postLogoutRedirectUris: list(
-          nonNull(
-            stringArg({
-              description:
-                'RP-Initated Logout 이후 리다이렉트할 uri들',
-            })
+        postLogoutRedirectUris: nonNull(
+          list(
+            nonNull(
+              stringArg({
+                description:
+                  'RP-Initated Logout 이후 리다이렉트할 uri들',
+              })
+            )
+          )
+        ),
+        defaultAddedScopes: nonNull(
+          list(
+            nonNull(
+              stringArg({
+                description:
+                  '요청하지 않아도 자동으로 추가되는 scope들',
+              })
+            )
           )
         ),
         backchannelLogoutUri: stringArg({
@@ -54,6 +66,7 @@ export const createOAuth2Client = extendType({
           allowedScopes,
           postLogoutRedirectUris,
           backchannelLogoutUri,
+          defaultAddedScopes,
         },
         ctx
       ) {
@@ -67,6 +80,9 @@ export const createOAuth2Client = extendType({
               '\n'
             ),
             backchannelLogoutUri,
+            defaultAddedScopes: defaultAddedScopes.join(
+              ' '
+            ),
           },
         });
 

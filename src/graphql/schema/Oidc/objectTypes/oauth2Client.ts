@@ -25,6 +25,10 @@ export const OAuth2Client = objectType({
           'RP-Initated Logout이후 리다이렉트할 uri들',
       }
     );
+    t.nonNull.list.nonNull.string('defaultAddedScopes', {
+      description:
+        '요청에 상관없이 자동으로 추가되는 scope들',
+    });
     t.string('backchannelLogoutUri', {
       description:
         'Backchannel Logout 요청을 받을 주소, 미지원시 null',
