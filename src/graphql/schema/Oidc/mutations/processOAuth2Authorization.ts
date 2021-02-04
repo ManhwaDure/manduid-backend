@@ -270,7 +270,11 @@ export const processOAuth2Authorization = extendType({
                     user,
                     getAvailableClaimsByScopes(
                       scopesRequested
-                    )
+                    ),
+                    {
+                      permissionsAsObject:
+                        client.returnPermissionsAsObject,
+                    }
                   )),
               });
 

@@ -22,10 +22,13 @@ const dateToDateString = (date: Date) => {
 
 export default async function (
   user: SSOUser & { member: Member },
-  neededClaims: string[]
-) {
+  neededClaims: string[],
+  options: { permissionsAsObject: boolean } = {
+    permissionsAsObject: false,
+  }
+): Promise<any> {
   const { nickname, website, emailAddress: email } = user;
-  let permissions: string[] = [];
+  let permissions: string[] | { [key: string]: true } = [];
   if (user.member.isExecutive || user.member.isPresident) {
     const allPermissions = Object.keys(
       permissionDescriptions
@@ -56,6 +59,14 @@ export default async function (
       }, []);
     }
   }
+
+  if (options.permissionsAsObject) {
+    const newPermissions: { [key: string]: true } = {};
+    for (const i of permissions) newPermissions[i] = true;
+
+    permissions = newPermissions;
+  }
+
   const claims = {
     sub: user.id,
     name: user.member.name,

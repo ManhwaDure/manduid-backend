@@ -67,6 +67,11 @@ router.get(
       allowedScopes
     );
 
+    const {
+      returnPermissionsAsObject: permissionsAsObject,
+    } = await ctx.db.oauth2Client.findUnique({
+      where: { id: ctx.oauth2.token.client.id },
+    });
     const userinfo: any = await claims(
       await ctx.db.sSOUser.findUnique({
         where: { id: ctx.oauth2.token.user.id },
@@ -74,7 +79,8 @@ router.get(
           member: true,
         },
       }),
-      availableClaims
+      availableClaims,
+      { permissionsAsObject }
     );
     userinfo.sub = ctx.oauth2.token.user.id;
 
