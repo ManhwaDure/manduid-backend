@@ -1,4 +1,5 @@
 import {
+  booleanArg,
   extendType,
   idArg,
   list,
@@ -54,6 +55,10 @@ export const updateOAuth2Client = extendType({
           description:
             'Backchannel logout 요청을 받을 주소, null일시 미지원으로 간주',
         }),
+        returnPermissionsAsObject: booleanArg({
+          description:
+            'permissions claim을 배열이 아닌 객체 형태로 반환할지의 여부',
+        }),
       },
       async resolve(
         _parent,
@@ -65,6 +70,7 @@ export const updateOAuth2Client = extendType({
           postLogoutRedirectUris,
           backchannelLogoutUri,
           defaultAddedScopes,
+          returnPermissionsAsObject,
         },
         ctx
       ) {
@@ -75,6 +81,7 @@ export const updateOAuth2Client = extendType({
           postLogoutRedirectUris?: string;
           backchannelLogoutUri?: string;
           defaultAddedScopes?: string;
+          returnPermissionsAsObject?: boolean;
         } = {};
 
         if (name !== null) data.name = name;
@@ -92,6 +99,8 @@ export const updateOAuth2Client = extendType({
           data.defaultAddedScopes = defaultAddedScopes.join(
             ' '
           );
+        if (returnPermissionsAsObject !== null)
+          data.returnPermissionsAsObject = returnPermissionsAsObject;
         const client = await ctx.db.oauth2Client.update({
           where: {
             id,

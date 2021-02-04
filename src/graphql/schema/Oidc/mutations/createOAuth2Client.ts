@@ -1,4 +1,5 @@
 import {
+  booleanArg,
   extendType,
   list,
   nonNull,
@@ -53,6 +54,12 @@ export const createOAuth2Client = extendType({
             )
           )
         ),
+        returnPermissionsAsObject: nonNull(
+          booleanArg({
+            description:
+              'permissions claim을 배열이 아닌 객체 형태로 반환할지의 여부',
+          })
+        ),
         backchannelLogoutUri: stringArg({
           description:
             'Backchannel logout 요청을 받을 주소, null일시 미지원으로 간주',
@@ -67,6 +74,7 @@ export const createOAuth2Client = extendType({
           postLogoutRedirectUris,
           backchannelLogoutUri,
           defaultAddedScopes,
+          returnPermissionsAsObject,
         },
         ctx
       ) {
@@ -83,6 +91,7 @@ export const createOAuth2Client = extendType({
             defaultAddedScopes: defaultAddedScopes.join(
               ' '
             ),
+            returnPermissionsAsObject,
           },
         });
 

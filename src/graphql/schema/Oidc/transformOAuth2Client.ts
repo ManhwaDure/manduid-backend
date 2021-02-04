@@ -11,6 +11,7 @@ export const transformOAuth2Client: (
   postLogoutRedirectUris: string[];
   backchannelLogoutUri: string;
   defaultAddedScopes: string[];
+  returnPermissionsAsObject: boolean;
 } = (client) => {
   if (client === null) return null;
   return {
@@ -26,5 +27,7 @@ export const transformOAuth2Client: (
     defaultAddedScopes: client.defaultAddedScopes.split(
       ' '
     ),
+    returnPermissionsAsObject:
+      client.returnPermissionsAsObject,
   };
 };

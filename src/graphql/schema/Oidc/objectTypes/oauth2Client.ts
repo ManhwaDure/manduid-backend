@@ -29,6 +29,10 @@ export const OAuth2Client = objectType({
       description:
         '요청에 상관없이 자동으로 추가되는 scope들',
     });
+    t.nonNull.boolean('returnPermissionsAsObject', {
+      description:
+        'permissions claim을 배열이 아닌 {[key: string]: true} 형태로 반환할지의 여부',
+    });
     t.string('backchannelLogoutUri', {
       description:
         'Backchannel Logout 요청을 받을 주소, 미지원시 null',
