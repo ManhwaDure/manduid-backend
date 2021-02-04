@@ -80,11 +80,12 @@ export const processOAuth2Authorization = extendType({
         ) as string[];
 
         // Insert defaultAddedScope into scope array
-        for (const i of client.defaultAddedScopes.split(
-          ' '
-        ))
-          if (!scopesRequested.includes(i))
-            scopesRequested.push(i);
+        if (client.defaultAddedScopes.trim().length !== 0)
+          for (const i of client.defaultAddedScopes
+            .trim()
+            .split(' '))
+            if (!scopesRequested.includes(i))
+              scopesRequested.push(i);
 
         // Verify scope
         if (
@@ -95,7 +96,7 @@ export const processOAuth2Authorization = extendType({
         )
           return (
             redirect_uri +
-            '?error=invalid_request&error_description=invalid_redirect_uri'
+            '?error=invalid_request&error_description=invalid_scope'
           );
         const openIdRequested = scopesRequested.includes(
           'openid'
