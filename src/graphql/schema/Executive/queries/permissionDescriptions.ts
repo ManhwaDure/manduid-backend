@@ -56,6 +56,7 @@ export const permissionDescriptions: {
     'OpenID Connect Client의 client secret을 재성성할 수 있는 권한',
   'oidc.update':
     'OpenID Connect Client를 수정할 수 있는 권한',
+  homepage: '동아리 소개 홈페이지를 수정할 수 있는 권한',
 };
 
 export const PermissionsQuery = extendType({

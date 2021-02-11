@@ -31,4 +31,5 @@ export type Permission =
   | 'oidc.create'
   | 'oidc.delete'
   | 'oidc.update'
-  | 'oidc.renewSecret';
+  | 'oidc.renewSecret'
+  | 'homepage';
