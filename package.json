@@ -81,16 +81,17 @@
     "build": "tsc",
     "lint": "eslint src/**/*.ts",
     "start-dev": "dotenv -e ./env/.env.dev -- node ./dist",
+    "start-for-docker": "yarn generate-keys --no-prompt --skip-if-found && yarn start",
     "start": "dotenv -e ./env/.env.prod -- node ./dist",
-    "nexus-build": "dotenv -e ./env/.env.dev -- ts-node --transpile-only ./src/build-schema.ts",
+    "nexus-build": "dotenv -e ./env/.env.build -- ts-node --transpile-only ./src/build-schema.ts",
     "create-president-dev": "dotenv -e ./env/.env.dev -- node ./dist/maintenance/createPresident",
-    "generate-keys": "dotenv -e ./env/.env.pord -- node ./dist/maintenance/generateKeys",
+    "generate-keys": "node ./dist/maintenance/generateKeys",
     "generate-keys-dev": "dotenv -e ./env/.env.dev -- node ./dist/maintenance/generateKeys",
-    "prisma-deploy": "dotenv -e ./env/.env.prod -- prisma migrate deploy --preview-feature",
+    "prisma-deploy": "prisma migrate deploy --preview-feature",
     "prisma-dev": "dotenv -e ./env/.env.dev -- prisma migrate dev --preview-feature",
     "prisma-studio-dev": "dotenv -e ./env/.env.dev -- prisma studio",
     "prisma-reset": "dotenv -e ./env/.env.dev -- prisma migrate reset --preview-feature",
     "prisma-create-migration": "dotenv -e ./env/.env.dev -- prisma migrate dev --create-only --preview-feature",
-    "prisma-generate": "dotenv -e ./env/.env.dev -- prisma generate"
+    "prisma-generate": "prisma generate"
   }
 }
