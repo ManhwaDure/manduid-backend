@@ -3,8 +3,8 @@ import {
   PrismaClient,
   SSOUser,
 } from '@prisma/client';
-import { permissionDescriptions } from '../../graphql/schema/Executive/queries/permissionDescriptions';
 import getAvatarUrl from '../../graphql/schema/Member/getAvatarUrl';
+import getAllPermissionsOf from '../getAllPermissionsOf';
 
 const db = new PrismaClient();
 
@@ -30,34 +30,7 @@ export default async function (
   const { nickname, website, emailAddress: email } = user;
   let permissions: string[] | { [key: string]: true } = [];
   if (user.member.isExecutive || user.member.isPresident) {
-    const allPermissions = Object.keys(
-      permissionDescriptions
-    );
-    const grantedPermissions = user.member.isPresident
-      ? ['root']
-      : (
-          await db.permission.findMany({
-            where: {
-              executiveTypeName:
-                user.member.executiveTypeName,
-            },
-          })
-        ).map((i) => i.permission);
-    if (grantedPermissions.includes('root')) {
-      permissions = allPermissions;
-    } else {
-      permissions = allPermissions.filter(
-        (i) =>
-          grantedPermissions.includes(i) ||
-          grantedPermissions.some((j) =>
-            i.startsWith(j + '.')
-          )
-      );
-      permissions = permissions.reduce((prev, cur) => {
-        if (!prev.includes(cur)) prev.push(cur);
-        return prev;
-      }, []);
-    }
+    permissions = await getAllPermissionsOf(user);
   }
 
   if (options.permissionsAsObject) {
