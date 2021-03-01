@@ -78,17 +78,21 @@ router.get(
       where,
     });
     const result = await Promise.all(
-      users.map(async (i) => {
-        return {
-          id: i.ssoUser.id,
-          expulsed: i.memberType === 'Explusion',
-          removed: i.memberType === 'Removed',
-          permissions: await getAllPermissionsOf(i.ssoUser),
-          executiveTypeName: i.executiveTypeName,
-          president: i.isPresident,
-          executive: i.isExecutive,
-        };
-      })
+      users
+        .filter((i) => i.ssoUser !== null)
+        .map(async (i) => {
+          return {
+            id: i.ssoUser.id,
+            expulsed: i.memberType === 'Explusion',
+            removed: i.memberType === 'Removed',
+            permissions: await getAllPermissionsOf(
+              i.ssoUser
+            ),
+            executiveTypeName: i.executiveTypeName,
+            president: i.isPresident,
+            executive: i.isExecutive,
+          };
+        })
     );
     ctx.type = 'application/json';
     ctx.status = 200;
