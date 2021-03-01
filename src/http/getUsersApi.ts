@@ -49,14 +49,9 @@ router.get(
       }
       if (targets.includes('banned')) {
         OR.push({
-          OR: [
-            {
-              memberType: 'Explusion',
-            },
-            {
-              memberType: 'Removed',
-            },
-          ],
+          memberType: {
+            in: ['Explusion', 'Removed'],
+          },
         });
       }
       where = {
