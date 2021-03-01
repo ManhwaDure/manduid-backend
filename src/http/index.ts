@@ -1,4 +1,5 @@
 import Koa, { DefaultContext, DefaultState } from 'koa';
+import UserApiRouter from './getUsersApi';
 import { createContext } from './oauth2/middlewares';
 import OAuth2Router from './oauth2/router';
 import OidcRouter from './oidc/router';
@@ -26,5 +27,7 @@ koa.use(OidcRouter.allowedMethods());
 koa.use(OidcRouter.routes());
 koa.use(OAuth2Router.allowedMethods());
 koa.use(OAuth2Router.routes());
+koa.use(UserApiRouter.allowedMethods());
+koa.use(UserApiRouter.routes());
 
 export default koa;
