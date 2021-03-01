@@ -32,4 +32,12 @@ export type Permission =
   | 'oidc.delete'
   | 'oidc.update'
   | 'oidc.renewSecret'
-  | 'homepage';
+  | 'homepage'
+  | 'wiki'
+  | 'wiki.ban'
+  | 'wiki.toron'
+  | 'wiki.check'
+  | 'wiki.acl'
+  | 'wiki.hidel'
+  | 'wiki.give'
+  | 'wiki.owner';
