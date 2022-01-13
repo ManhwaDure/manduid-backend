@@ -11,172 +11,189 @@ generator client {
 }
 
 model Member {
-  id  Int @default(autoincrement()) @id
-  createdAt DateTime @default(now())
-  creatorId Int?
-  creationReason String @default("")
-  createdBy Member? @relation("Member_creator", fields: [creatorId], references: [id])
-  ssoUser SSOUser?
-  name String
-  department String
-  studentId Int
-  phoneNumber String
-  birthday DateTime?
-  isExecutive Boolean @default(false)
-  isPresident Boolean @default(false)
-  executiveTypeName String?
-  memberType MemberType
-  schoolRegisterationStatus SchoolRegisterationStatus 
-  executiveType ExecutiveType? @relation(fields: [executiveTypeName], references: [name])
-  histories MemberRecordHistory[] @relation("MemberRecordHistory_member")
+  id                             Int                       @id @default(autoincrement())
+  createdAt                      DateTime                  @default(now())
+  creatorId                      Int?
+  creationReason                 String                    @default("")
+  createdBy                      Member?                   @relation("Member_creator", fields: [creatorId], references: [id])
+  ssoUser                        SSOUser?
+  name                           String
+  department                     String
+  studentId                      Int
+  phoneNumber                    String
+  birthday                       DateTime?
+  isExecutive                    Boolean                   @default(false)
+  isPresident                    Boolean                   @default(false)
+  executiveTypeName              String?
+  memberType                     MemberType
+  schoolRegisterationStatus      SchoolRegisterationStatus
+  executiveType                  ExecutiveType?            @relation(fields: [executiveTypeName], references: [name])
+  histories                      MemberRecordHistory[]     @relation("MemberRecordHistory_member")
+  createdMembers                 Member[]                  @relation("Member_creator")
+  createdMemberRecordHistories   MemberRecordHistory[]     @relation("MemberRecordHistory_creator")
+  acceptedApplicationAcceptances ApplicationAcceptance[]
+  subscriptions                  Subscription[]
 }
 
 model MemberRecordHistory {
+  memberId                  Int
+  createdAt                 DateTime                  @default(now())
+  creatorId                 Int
+  creationReason            String                    @default("")
+  createdBy                 Member                    @relation("MemberRecordHistory_creator", fields: [creatorId], references: [id])
+  name                      String
+  department                String
+  studentId                 Int
+  phoneNumber               String
+  birthday                  DateTime?
+  isExecutive               Boolean                   @default(false)
+  isPresident               Boolean                   @default(false)
+  executiveTypeName         String?
+  memberType                MemberType
+  schoolRegisterationStatus SchoolRegisterationStatus
+  executiveType             ExecutiveType?            @relation(fields: [executiveTypeName], references: [name])
+  member                    Member                    @relation("MemberRecordHistory_member", fields: [memberId], references: [id])
+
   @@id([memberId, createdAt])
-  memberId Int
-  createdAt DateTime @default(now())
-  creatorId Int
-  creationReason String @default("")
-  createdBy Member @relation("MemberRecordHistory_creator", fields: [creatorId], references: [id])
-  name String
-  department String
-  studentId Int
-  phoneNumber String
-  birthday DateTime?
-  isExecutive Boolean @default(false)
-  isPresident Boolean @default(false)
-  executiveTypeName String?
-  memberType MemberType
-  schoolRegisterationStatus SchoolRegisterationStatus 
-  executiveType ExecutiveType? @relation(fields: [executiveTypeName], references: [name])
-  member Member @relation("MemberRecordHistory_member", fields: [memberId], references: [id])
 }
 
 model SSOUser {
-  id String @id
-  memberId Int @unique
-  emailAddress String @unique
-  password String
-  hashAlgorithm HashAlgorithm
-  member Member @relation(fields: [memberId], references: [id])
+  id                       String                    @id
+  memberId                 Int                       @unique
+  emailAddress             String                    @unique
+  password                 String
+  hashAlgorithm            HashAlgorithm
+  member                   Member                    @relation(fields: [memberId], references: [id])
   // OIDC Profile
-  introduction String?
-  website String?
-  nickname String? @default("만두")
-  customAvatarTag String?
+  introduction             String?
+  website                  String?
+  nickname                 String?                   @default("만두")
+  customAvatarTag          String?
+  GraphQlSessions          GraphQlSession[]
+  oauth2AuthorizationCodes oauth2AuthorizationCode[]
 }
 
 model GraphQlSession {
-  id String @id @default(cuid())
-  ssoUserId String
-  expiresAt DateTime
-  createdAt DateTime @default(now())
-  ssoUser SSOUser @relation(fields: [ssoUserId], references: [id])
+  id                       String                    @id @default(cuid())
+  ssoUserId                String
+  expiresAt                DateTime
+  createdAt                DateTime                  @default(now())
+  ssoUser                  SSOUser                   @relation(fields: [ssoUserId], references: [id])
+  OidcSessions             OidcSession[]
+  oauth2AuthorizationCodes oauth2AuthorizationCode[]
 }
 
 model OidcSession {
-  id String @id @default(cuid())
+  id               String         @id @default(cuid())
   graphQlSessionId String
-  clientId String
-  graphQlSession GraphQlSession @relation(fields: [graphQlSessionId], references: [id])
-  client oauth2Client @relation(fields: [clientId], references: [id])
+  clientId         String
+  graphQlSessions  GraphQlSession @relation(fields: [graphQlSessionId], references: [id])
+  clients          oauth2Client   @relation(fields: [clientId], references: [id])
 }
 
 model ExecutiveType {
-  name String @id
-  permissions Permission[]
+  name                 String                @id
+  permissions          Permission[]
+  Members              Member[]
+  MemberRecordHistorys MemberRecordHistory[]
 }
 
 model Permission {
-  @@id([executiveTypeName, permission])
   executiveTypeName String
-  permission String
-  executiveType ExecutiveType @relation(fields: [executiveTypeName], references: [name])
+  permission        String
+  executiveType     ExecutiveType @relation(fields: [executiveTypeName], references: [name])
+
+  @@id([executiveTypeName, permission])
 }
 
 model Code {
-  code String @default(cuid()) @id
-  id String
+  code      String    @id @default(cuid())
+  id        String
   expiresAt DateTime
-  usage CodeUsage
-  data Json
+  usage     CodeUsage
+  data      Json
 }
 
 model ApplicationForm {
-  applicationId String @default(uuid()) @id
-  reApplication Boolean
-  name String
-  department String
-  studentId Int
-  phoneNumber String
-  birthday DateTime
-  applicationDate DateTime @default(now())
-  acceptance ApplicationAcceptance?
+  applicationId     String                            @id @default(uuid())
+  reApplication     Boolean
+  name              String
+  department        String
+  studentId         Int
+  phoneNumber       String
+  birthday          DateTime
+  applicationDate   DateTime                          @default(now())
+  acceptance        ApplicationAcceptance?
+  additionalAnswers ApplicationFormAdditionalAnswer[]
 }
 
 model ApplicationFormAdditionalQuestion {
-  id String @default(uuid()) @id
+  id       String                            @id @default(uuid())
   question String
-  deleted Boolean @default(false)
-  required Boolean @default(false)
+  deleted  Boolean                           @default(false)
+  required Boolean                           @default(false)
+  answers  ApplicationFormAdditionalAnswer[]
 }
 
 model ApplicationFormAdditionalAnswer {
-  questionId String
+  questionId    String
   applicationId String
-  answer String
-  question ApplicationFormAdditionalQuestion @relation(fields: [questionId], references: [id])
-  form ApplicationForm @relation(fields: [applicationId], references: [applicationId])
+  answer        String
+  question      ApplicationFormAdditionalQuestion @relation(fields: [questionId], references: [id])
+  form          ApplicationForm                   @relation(fields: [applicationId], references: [applicationId])
+
   @@id([questionId, applicationId])
 }
 
 model ApplicationAcceptance {
-  applicationId String @id
-  accepterId Int
-  accepted Boolean
-  reason String
-  acceptedAt DateTime @default(now())
+  applicationId   String          @id
+  accepterId      Int
+  accepted        Boolean
+  reason          String
+  acceptedAt      DateTime        @default(now())
   applicationForm ApplicationForm @relation(fields: [applicationId], references: [applicationId])
-  acceptedBy Member @relation(fields: [accepterId], references: [id])
+  acceptedBy      Member          @relation(fields: [accepterId], references: [id])
 }
 
 model Subscription {
   subscriptorId Int
-  subscriptor Member @relation(fields: [subscriptorId], references: [id])
-  target SubscriptionTarget
-  method SubscriptionMethod
+  subscriptor   Member             @relation(fields: [subscriptorId], references: [id])
+  target        SubscriptionTarget
+  method        SubscriptionMethod
 
   @@id([subscriptorId, target, method])
 }
 
 model oauth2Client {
-  id String @id @default(cuid())
-  secret String
-  name String
-  redirectUris String
-  allowedScopes String
-  defaultAddedScopes String
-  returnPermissionsAsObject Boolean @default(false)
-  postLogoutRedirectUris String
-  backchannelLogoutUri String?
+  id                        String                    @id @default(cuid())
+  secret                    String
+  name                      String
+  redirectUris              String
+  allowedScopes             String
+  defaultAddedScopes        String
+  returnPermissionsAsObject Boolean                   @default(false)
+  postLogoutRedirectUris    String
+  backchannelLogoutUri      String?
+  oidcSessions              OidcSession[]
+  oauth2AuthorizationCodes  oauth2AuthorizationCode[]
 }
 
 model oauth2Interaction {
-  id String @id @default(cuid())
+  id     String @id @default(cuid())
   params Json
 }
 
 model oauth2AuthorizationCode {
-  code String @id @default(cuid())
-  clientId String
+  code             String         @id @default(cuid())
+  clientId         String
   graphQlSessionId String
-  nonce String?
-  userId String?
-  allowedScope String
-  expiredAt DateTime
-  client oauth2Client @relation(fields: [clientId], references: [id])
-  user SSOUser? @relation(fields: [userId], references: [id])
-  graphQlSession GraphQlSession @relation(fields: [graphQlSessionId], references: [id])
+  nonce            String?
+  userId           String?
+  allowedScope     String
+  expiredAt        DateTime
+  client           oauth2Client   @relation(fields: [clientId], references: [id])
+  user             SSOUser?       @relation(fields: [userId], references: [id])
+  graphQlSession   GraphQlSession @relation(fields: [graphQlSessionId], references: [id])
 }
 
 enum SubscriptionMethod {
