@@ -29,7 +29,7 @@ export const forgotPasswordMutation = extendType({
           data: {
             usage: 'PasswordRecovery',
             data: {
-              emailAddress,
+              userId: user.id,
             },
             expiresAt: new Date(
               Date.now() + 1000 * 60 * 30

@@ -37,13 +37,19 @@ export const resetPasswordMutation = extendType({
 
         await ctx.db.sSOUser.update({
           where: {
-            emailAddress: (token.data as any).emailAddress,
+            id: (token.data as any).userId,
           },
           data: {
             password: await bcrypt.hash(
               newPassword,
               await bcrypt.genSalt()
             ),
+          },
+        });
+
+        await ctx.db.code.delete({
+          where: {
+            code: resetToken,
           },
         });
 
