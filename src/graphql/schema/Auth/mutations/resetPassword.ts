@@ -44,6 +44,7 @@ export const resetPasswordMutation = extendType({
               newPassword,
               await bcrypt.genSalt()
             ),
+            hashAlgorithm: 'bcrypt',
           },
         });
 
