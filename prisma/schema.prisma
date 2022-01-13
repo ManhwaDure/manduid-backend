@@ -33,6 +33,11 @@ model Member {
   createdMemberRecordHistories   MemberRecordHistory[]     @relation("MemberRecordHistory_creator")
   acceptedApplicationAcceptances ApplicationAcceptance[]
   subscriptions                  Subscription[]
+  actedDisciplinaryActions       DisciplinaryAction[]      @relation("discliplinaryAction_actor")
+  subjectedDisciplinaryActions   DisciplinaryAction[]      @relation("disclipinaryAction_subject")
+  createdDisciplinaryActions     DisciplinaryAction[]      @relation("disciplinaryAction_creator")
+  pariticipatedActivities        ActivityParticiptation[]  @relation("activityParticiptation_actor")
+  createdActivityParticipations  ActivityParticiptation[]  @relation("activityParticiptation_creator")
 }
 
 model MemberRecordHistory {
@@ -196,6 +201,31 @@ model oauth2AuthorizationCode {
   graphQlSession   GraphQlSession @relation(fields: [graphQlSessionId], references: [id])
 }
 
+model ActivityParticiptation {
+  id             Int      @id @default(autoincrement())
+  actorId        Int
+  creatorId      Int
+  actor          Member   @relation(fields: [actorId], references: [id], name: "activityParticiptation_actor")
+  creator        Member   @relation(fields: [creatorId], references: [id], name: "activityParticiptation_creator")
+  activity       String
+  createdAt      DateTime @default(now())
+  participatedAt DateTime @default(now())
+}
+
+model DisciplinaryAction {
+  id        Int                    @id @default(autoincrement())
+  actorId   Int
+  subjectId Int
+  creatorId Int
+  actor     Member                 @relation(fields: [actorId], references: [id], name: "discliplinaryAction_actor")
+  subject   Member                 @relation(fields: [subjectId], references: [id], name: "disclipinaryAction_subject")
+  creator   Member                 @relation(fields: [creatorId], references: [id], name: "disciplinaryAction_creator")
+  type      DisciplinaryActionType
+  reason    String
+  actedAt   DateTime               @default(now())
+  createdAt DateTime               @default(now())
+}
+
 enum SubscriptionMethod {
   Email
 }
@@ -230,4 +260,13 @@ enum CodeUsage {
   EmailVerification
   MembershipVerification
   PasswordRecovery
+}
+
+enum DisciplinaryActionType {
+  Caution
+  Warning
+  Probation
+  Impeachment
+  Explusion
+  Other
 }
