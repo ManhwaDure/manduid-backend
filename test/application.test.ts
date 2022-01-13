@@ -10,7 +10,7 @@ import {
   createApplicationFormAdditionalQuestionMutation,
   deleteApplicationFormAdditionalQuestionMutation,
   getApplicationByIdQuery,
-  membersQuery
+  membersQuery,
 } from './gqls';
 import { toISODateString } from './utils';
 
