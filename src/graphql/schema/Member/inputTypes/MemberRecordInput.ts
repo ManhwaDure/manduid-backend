@@ -18,6 +18,10 @@ export const MemberRecordInput = inputObjectType({
     t.nonNull.tel('phoneNumber', {
       description: '전화번호',
     });
+    t.string('memo', {
+      description: '비고 및 특이사항',
+      default: '',
+    });
     t.date('birthday', { description: '생일' });
   },
 });

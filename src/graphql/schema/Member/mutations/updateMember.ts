@@ -63,6 +63,7 @@ export const updateMemberMutation = extendType({
               member.schoolRegisterationStatus,
             studentId: member.studentId,
             birthday: member.birthday,
+            memo: member.memo,
             isExecutive: member.isExecutive,
             isPresident: member.isPresident,
             executiveType: member.isExecutive

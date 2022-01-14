@@ -51,5 +51,8 @@ export const MemberRecord = objectType({
         else return null;
       },
     });
+    t.nonNull.string('memo', {
+      description: '비고 및 특이사항',
+    });
   },
 });

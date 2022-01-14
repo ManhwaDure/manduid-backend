@@ -170,5 +170,8 @@ export const Member = objectType({
         return records;
       },
     });
+    t.nonNull.string('memo', {
+      description: '비고 및 특이사항',
+    });
   },
 });

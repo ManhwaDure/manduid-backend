@@ -48,6 +48,7 @@ export const createMemberMutation = extendType({
           studentId,
           phoneNumber,
           birthday,
+          memo,
         } = data;
         return await ctx.db.member.create({
           data: {
@@ -57,6 +58,7 @@ export const createMemberMutation = extendType({
             phoneNumber,
             schoolRegisterationStatus,
             studentId,
+            memo,
             birthday,
             createdAt: new Date(),
             creationReason: '직접입력',
