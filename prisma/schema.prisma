@@ -18,6 +18,7 @@ model Member {
   createdBy                      Member?                   @relation("Member_creator", fields: [creatorId], references: [id])
   ssoUser                        SSOUser?
   name                           String
+  memo                           String                    @default("")
   department                     String
   studentId                      Int
   phoneNumber                    String
@@ -47,6 +48,7 @@ model MemberRecordHistory {
   creationReason            String                    @default("")
   createdBy                 Member                    @relation("MemberRecordHistory_creator", fields: [creatorId], references: [id])
   name                      String
+  memo                      String                    @default("")
   department                String
   studentId                 Int
   phoneNumber               String
