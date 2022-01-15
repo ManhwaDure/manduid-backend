@@ -94,8 +94,8 @@ model OidcSession {
   id               String         @id @default(cuid())
   graphQlSessionId String
   clientId         String
-  graphQlSessions  GraphQlSession @relation(fields: [graphQlSessionId], references: [id])
-  clients          oauth2Client   @relation(fields: [clientId], references: [id])
+  graphQlSession   GraphQlSession @relation(fields: [graphQlSessionId], references: [id])
+  client           oauth2Client   @relation(fields: [clientId], references: [id])
 }
 
 model ExecutiveType {
