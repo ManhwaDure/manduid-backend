@@ -215,17 +215,18 @@ model ActivityParticiptation {
 }
 
 model DisciplinaryAction {
-  id        Int                    @id @default(autoincrement())
-  actorId   Int
-  subjectId Int
-  creatorId Int
-  actor     Member                 @relation(fields: [actorId], references: [id], name: "discliplinaryAction_actor")
-  subject   Member                 @relation(fields: [subjectId], references: [id], name: "disclipinaryAction_subject")
-  creator   Member                 @relation(fields: [creatorId], references: [id], name: "disciplinaryAction_creator")
-  type      DisciplinaryActionType
-  reason    String
-  actedAt   DateTime               @default(now())
-  createdAt DateTime               @default(now())
+  id            Int                    @id @default(autoincrement())
+  actorId       Int
+  subjectId     Int
+  creatorId     Int
+  actor         Member                 @relation(fields: [actorId], references: [id], name: "discliplinaryAction_actor")
+  subject       Member                 @relation(fields: [subjectId], references: [id], name: "disclipinaryAction_subject")
+  creator       Member                 @relation(fields: [creatorId], references: [id], name: "disciplinaryAction_creator")
+  type          DisciplinaryActionType
+  reason        String
+  reasonSummary String
+  actedAt       DateTime               @default(now())
+  createdAt     DateTime               @default(now())
 }
 
 enum SubscriptionMethod {
