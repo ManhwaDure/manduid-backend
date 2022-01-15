@@ -45,7 +45,7 @@ export const updateMemberMutation = extendType({
           data: {
             createdBy: {
               connect: {
-                id: ctx.user.memberId,
+                id: member.creatorId,
               },
             },
             createdAt: member.createdAt,
