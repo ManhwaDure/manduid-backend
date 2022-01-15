@@ -270,5 +270,6 @@ enum DisciplinaryActionType {
   Probation
   Impeachment
   Explusion
+  Nullify
   Other
 }
