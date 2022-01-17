@@ -88,7 +88,7 @@
     "create-president-dev": "dotenv -e ./env/.env.dev -- node ./dist/maintenance/createPresident",
     "generate-keys": "node ./dist/maintenance/generateKeys",
     "generate-keys-dev": "dotenv -e ./env/.env.dev -- node ./dist/maintenance/generateKeys",
-    "prisma-deploy": "prisma migrate deploy --preview-feature",
+    "prisma-deploy": "dotenv -e ./env/.env.dev -- prisma migrate deploy --preview-feature",
     "prisma-dev": "dotenv -e ./env/.env.dev -- prisma migrate dev --preview-feature",
     "prisma-studio-dev": "dotenv -e ./env/.env.dev -- prisma studio",
     "prisma-reset": "dotenv -e ./env/.env.dev -- prisma migrate reset --preview-feature",
