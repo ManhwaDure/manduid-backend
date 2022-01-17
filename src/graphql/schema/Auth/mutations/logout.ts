@@ -26,7 +26,7 @@ export const LogoutMutation = extendType({
               id: token,
             },
             include: {
-              OidcSession: {
+              OidcSessions: {
                 include: {
                   client: true,
                 },
@@ -38,7 +38,7 @@ export const LogoutMutation = extendType({
         if (session === null) return false;
 
         const backchannelRequests = [];
-        for (const oidcSession of session.OidcSession) {
+        for (const oidcSession of session.OidcSessions) {
           const {
             backchannelLogoutUri,
           } = oidcSession.client;
@@ -107,7 +107,7 @@ export const LogoutMutation = extendType({
         await ctx.db.oidcSession.deleteMany({
           where: {
             id: {
-              in: session.OidcSession.map((i) => i.id),
+              in: session.OidcSessions.map((i) => i.id),
             },
           },
         });

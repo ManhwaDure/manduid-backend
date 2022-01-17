@@ -139,7 +139,7 @@ export const ApplyMutation = extendType({
               phoneNumber: form.phoneNumber,
               studentId: form.studentId,
               reApplication,
-              ApplicationFormAdditionalAnswer: additionalAnswersProvied
+              additionalAnswers: additionalAnswersProvied
                 ? {
                     create: additionalAnswers.map((i) => {
                       return {
@@ -155,7 +155,7 @@ export const ApplyMutation = extendType({
                 : undefined,
             },
             include: {
-              ApplicationFormAdditionalAnswer: {
+              additionalAnswers: {
                 include: {
                   question: true,
                 },
@@ -167,7 +167,7 @@ export const ApplyMutation = extendType({
         // Do not wait
         ctx.fireSubscription('NewApplicationForm', {
           form: formCreated,
-          additionalAnswers: formCreated.ApplicationFormAdditionalAnswer.map(
+          additionalAnswers: formCreated.additionalAnswers.map(
             (i) => {
               return {
                 answer: i.answer,
