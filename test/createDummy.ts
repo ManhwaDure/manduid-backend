@@ -158,9 +158,9 @@ export const createDummy: () => Promise<{
     const prisma = new PrismaClient();
     // Simply drop and recreate database
     prisma
-      .$executeRaw(`DROP DATABASE manduid_test`)
+      .$executeRaw`DROP DATABASE IF EXISTS manduid_test`
       .then(() =>
-        prisma.$executeRaw(`CREATE DATABASE manduid_test`)
+        prisma.$executeRaw`CREATE DATABASE manduid_test`
       )
       .then(() => {
         // Apply all migrations
@@ -169,8 +169,7 @@ export const createDummy: () => Promise<{
           [
             'prisma',
             'migrate',
-            'deploy',
-            '--preview-feature',
+            'deploy'
           ],
           { shell: true }
         );
