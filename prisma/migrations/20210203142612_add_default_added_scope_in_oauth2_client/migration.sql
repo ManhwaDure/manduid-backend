@@ -5,61 +5,61 @@
 
 */
 -- DropForeignKey
-ALTER TABLE `applicationacceptance` DROP FOREIGN KEY `applicationacceptance_ibfk_2`;
+ALTER TABLE `ApplicationAcceptance` DROP FOREIGN KEY `applicationacceptance_ibfk_2`;
 
 -- DropForeignKey
-ALTER TABLE `applicationacceptance` DROP FOREIGN KEY `applicationacceptance_ibfk_1`;
+ALTER TABLE `ApplicationAcceptance` DROP FOREIGN KEY `applicationacceptance_ibfk_1`;
 
 -- DropForeignKey
-ALTER TABLE `applicationformadditionalanswer` DROP FOREIGN KEY `applicationformadditionalanswer_ibfk_2`;
+ALTER TABLE `ApplicationFormAdditionalAnswer` DROP FOREIGN KEY `applicationformadditionalanswer_ibfk_2`;
 
 -- DropForeignKey
-ALTER TABLE `applicationformadditionalanswer` DROP FOREIGN KEY `applicationformadditionalanswer_ibfk_1`;
+ALTER TABLE `ApplicationFormAdditionalAnswer` DROP FOREIGN KEY `applicationformadditionalanswer_ibfk_1`;
 
 -- DropForeignKey
-ALTER TABLE `graphqlsession` DROP FOREIGN KEY `graphqlsession_ibfk_1`;
+ALTER TABLE `GraphQlSession` DROP FOREIGN KEY `graphqlsession_ibfk_1`;
 
 -- DropForeignKey
-ALTER TABLE `member` DROP FOREIGN KEY `member_ibfk_1`;
+ALTER TABLE `Member` DROP FOREIGN KEY `member_ibfk_1`;
 
 -- DropForeignKey
-ALTER TABLE `member` DROP FOREIGN KEY `member_ibfk_2`;
+ALTER TABLE `Member` DROP FOREIGN KEY `member_ibfk_2`;
 
 -- DropForeignKey
-ALTER TABLE `memberrecordhistory` DROP FOREIGN KEY `memberrecordhistory_ibfk_1`;
+ALTER TABLE `MemberRecordHistory` DROP FOREIGN KEY `memberrecordhistory_ibfk_1`;
 
 -- DropForeignKey
-ALTER TABLE `memberrecordhistory` DROP FOREIGN KEY `memberrecordhistory_ibfk_2`;
+ALTER TABLE `MemberRecordHistory` DROP FOREIGN KEY `memberrecordhistory_ibfk_2`;
 
 -- DropForeignKey
-ALTER TABLE `memberrecordhistory` DROP FOREIGN KEY `memberrecordhistory_ibfk_3`;
+ALTER TABLE `MemberRecordHistory` DROP FOREIGN KEY `memberrecordhistory_ibfk_3`;
 
 -- DropForeignKey
-ALTER TABLE `oauth2authorizationcode` DROP FOREIGN KEY `oauth2authorizationcode_ibfk_1`;
+ALTER TABLE `oauth2AuthorizationCode` DROP FOREIGN KEY `oauth2authorizationcode_ibfk_1`;
 
 -- DropForeignKey
-ALTER TABLE `oauth2authorizationcode` DROP FOREIGN KEY `oauth2authorizationcode_ibfk_3`;
+ALTER TABLE `oauth2AuthorizationCode` DROP FOREIGN KEY `oauth2authorizationcode_ibfk_3`;
 
 -- DropForeignKey
-ALTER TABLE `oauth2authorizationcode` DROP FOREIGN KEY `oauth2authorizationcode_ibfk_2`;
+ALTER TABLE `oauth2AuthorizationCode` DROP FOREIGN KEY `oauth2authorizationcode_ibfk_2`;
 
 -- DropForeignKey
-ALTER TABLE `oidcsession` DROP FOREIGN KEY `oidcsession_ibfk_2`;
+ALTER TABLE `OidcSession` DROP FOREIGN KEY `oidcsession_ibfk_2`;
 
 -- DropForeignKey
-ALTER TABLE `oidcsession` DROP FOREIGN KEY `oidcsession_ibfk_1`;
+ALTER TABLE `OidcSession` DROP FOREIGN KEY `oidcsession_ibfk_1`;
 
 -- DropForeignKey
-ALTER TABLE `permission` DROP FOREIGN KEY `permission_ibfk_1`;
+ALTER TABLE `Permission` DROP FOREIGN KEY `permission_ibfk_1`;
 
 -- DropForeignKey
-ALTER TABLE `ssouser` DROP FOREIGN KEY `ssouser_ibfk_1`;
+ALTER TABLE `SSOUser` DROP FOREIGN KEY `ssouser_ibfk_1`;
 
 -- DropForeignKey
-ALTER TABLE `subscription` DROP FOREIGN KEY `subscription_ibfk_1`;
+ALTER TABLE `Subscription` DROP FOREIGN KEY `subscription_ibfk_1`;
 
 -- AlterTable
-ALTER TABLE `oauth2client` ADD COLUMN     `defaultAddedScopes` VARCHAR(191) NOT NULL;
+ALTER TABLE `oauth2Client` ADD COLUMN     `defaultAddedScopes` VARCHAR(191) NOT NULL;
 
 -- AddForeignKey
 ALTER TABLE `ApplicationAcceptance` ADD FOREIGN KEY (`applicationId`) REFERENCES `ApplicationForm`(`applicationId`) ON DELETE CASCADE ON UPDATE CASCADE;

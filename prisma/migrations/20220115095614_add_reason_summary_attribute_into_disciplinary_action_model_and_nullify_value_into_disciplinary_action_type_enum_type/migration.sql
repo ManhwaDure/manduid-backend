@@ -71,7 +71,7 @@ ALTER TABLE `Permission` DROP FOREIGN KEY `permission_ibfk_1`;
 ALTER TABLE `SSOUser` DROP FOREIGN KEY `ssouser_ibfk_1`;
 
 -- DropForeignKey
-ALTER TABLE `subscription` DROP FOREIGN KEY `subscription_ibfk_1`;
+ALTER TABLE `Subscription` DROP FOREIGN KEY `subscription_ibfk_1`;
 
 -- AlterTable
 ALTER TABLE `DisciplinaryAction` ADD COLUMN     `reasonSummary` VARCHAR(191) NOT NULL,
