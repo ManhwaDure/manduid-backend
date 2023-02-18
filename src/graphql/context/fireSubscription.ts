@@ -13,16 +13,23 @@ export const fireSubscription: FireSubscriptionFunction = async (
         target: 'NewApplicationForm',
       },
       include: {
-        subscriptor: {
-          include: {
-            ssoUser: true,
-          },
-        },
+        subscriptor: true,
       },
     });
+
     for (const subscriptor of subscriptors) {
+      const ssoUser = await db.sSOUser.findFirst({
+        where: {
+          memberId: subscriptor.subscriptor.id,
+        },
+      });
+
+      if (ssoUser === null) {
+        continue;
+      }
+
       await sendEmail(
-        subscriptor.subscriptor.ssoUser.emailAddress,
+        ssoUser.emailAddress,
         subscriptor.subscriptor.name,
         'NewApplicationForm',
         data
