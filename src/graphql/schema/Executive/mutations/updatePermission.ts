@@ -1,9 +1,9 @@
-import { PrismaPromise } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import {
   extendType,
   list,
   nonNull,
-  stringArg,
+  stringArg
 } from 'nexus';
 
 export const updatePermissionMutation = extendType({
@@ -28,7 +28,7 @@ export const updatePermissionMutation = extendType({
         { executiveTypeName, permissions },
         ctx
       ) {
-        const actions: PrismaPromise<any>[] = [];
+        const actions: Prisma.PrismaPromise<any>[] = [];
         actions.push(
           ctx.db.permission.deleteMany({
             where: {
