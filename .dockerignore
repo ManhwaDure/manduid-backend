@@ -1,2 +1,11 @@
 node_modules
 .git
+.vscode
+data
+dist
+.env/.env.dev
+.env/.env.prod
+.env/.env.test
+oidc_keys.json
+test_keys.json
+schema.graphql
