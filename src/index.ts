@@ -8,6 +8,9 @@ graphql.start(
     endpoint: '/',
     playground:
       process.env.NODE_ENV === 'development' ? '/' : false,
+    bodyParserOptions: {
+      limit: '1GB',
+    },
   },
   () => console.log(`Listening GraphQL on ${GRAPHQL_PORT}`)
 );
