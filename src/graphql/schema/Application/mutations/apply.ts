@@ -1,5 +1,9 @@
 import { arg, extendType, list, nonNull } from 'nexus';
 import { GraphQLExposableError } from '../../../exposableError';
+import {
+  ApplicationNonAcceptingPeroidReason,
+  isApplicationAcceptingPeroid,
+} from '../isApplicationAccepting';
 
 export const ApplyMutation = extendType({
   type: 'Mutation',
@@ -30,6 +34,28 @@ export const ApplyMutation = extendType({
         { form, additionalAnswers },
         ctx
       ) {
+        const isApplicationAcceptingPeroidNow = await isApplicationAcceptingPeroid(
+          ctx.db
+        );
+        if (isApplicationAcceptingPeroidNow !== true) {
+          switch (isApplicationAcceptingPeroidNow) {
+            case ApplicationNonAcceptingPeroidReason.locked:
+              throw new GraphQLExposableError(
+                '현재 입부원서를 받지 않고 있습니다.'
+              );
+
+            case ApplicationNonAcceptingPeroidReason.earlierThanBeginDate:
+              throw new GraphQLExposableError(
+                '아직 입부원서 제출 시작일이 아닙니다.'
+              );
+
+            case ApplicationNonAcceptingPeroidReason.laterThanEndDate:
+              throw new GraphQLExposableError(
+                '입부원서 제출이 마감되어 더 이상의 입부원서를 받지 않습니다.'
+              );
+          }
+        }
+
         const additionalAnswersProvied =
           typeof additionalAnswers !== 'undefined' &&
           additionalAnswers !== null &&
