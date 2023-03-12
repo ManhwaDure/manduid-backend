@@ -61,14 +61,6 @@ export const permissionDescriptions: {
   'oidc.update':
     'OpenID Connect Client를 수정할 수 있는 권한',
   homepage: '동아리 소개 홈페이지를 수정할 수 있는 권한',
-  wiki: '동아리 위키와 관련된 모든 권한',
-  'wiki.ban': '동아리 위키 차단 권한',
-  'wiki.toron': '동아리 위키 토론 관리 권한',
-  'wiki.check': '동아리 위키 사용자 권한 권한',
-  'wiki.acl': '동아리 위키 문서 ACL 관리 권한',
-  'wiki.hidel': '동아리 위키 문서 역사 숨김 권한',
-  'wiki.give': '동아리 위키 권한 부여 권한',
-  'wiki.owner': '동아리 위키 소유자 권한',
 };
 
 export const PermissionsQuery = extendType({
