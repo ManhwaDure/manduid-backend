@@ -103,6 +103,10 @@ const permissions = shield(
       ),
       changePassword: isAuthenticated,
       updateMyProfile: isAuthenticated,
+      lockApplication: hasPermission('application.lock'),
+      setApplicationPeroid: hasPermission(
+        'application.setPeroid'
+      ),
     },
     Member: {
       creator: hasPermission('roll.list'),

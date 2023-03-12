@@ -2,6 +2,8 @@ export type Permission =
   | 'root'
   | 'application'
   | 'application.read'
+  | 'application.setPeroid'
+  | 'application.lock'
   | 'application.accept'
   | 'application.deny'
   | 'application.additionalQuestion'

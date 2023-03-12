@@ -11,6 +11,10 @@ export const permissionDescriptions: {
     '입부/재입부원서를 거부할 수 있는 권한',
   'application.read':
     '입부/재입부원서를 조회하고 열람할 수 있는 권한',
+  'application.setPeroid':
+    '입부/재입부원서 제출기간을 설정할 수 있는 권한',
+  'application.lock':
+    '입부/재입부원서 제출을 더 이상 받지 않도록 설정할 수 있는 권한',
   executive: '집행부원이나 집행부원 직책에 관한 모든 권한',
   'executive.appoint': '집행부원을 선임할 수 있는 권한',
   'executive.disappoint': '집행부원을 해임할 수 있는 권한',
