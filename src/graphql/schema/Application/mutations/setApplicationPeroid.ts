@@ -22,7 +22,7 @@ export const SetApplicationPeroidMutation = extendType({
         '입부원서 제출 기간을 설정합니다. 시작일과 종료일이 둘 다 없을 시 상시모집으로 운영됩니다.',
       async resolve(_parent, { begin, end }, ctx) {
         if (begin === null) {
-          await ctx.db.configuration.delete({
+          await ctx.db.configuration.deleteMany({
             where: {
               id: applicationBeginDateConfigKey,
             },
@@ -43,7 +43,7 @@ export const SetApplicationPeroidMutation = extendType({
         }
 
         if (end === null) {
-          await ctx.db.configuration.delete({
+          await ctx.db.configuration.deleteMany({
             where: {
               id: applicationEndDateConfigKey,
             },
