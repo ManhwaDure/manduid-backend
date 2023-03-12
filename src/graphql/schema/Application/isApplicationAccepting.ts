@@ -17,7 +17,8 @@ export async function isApplicationAcceptingPeroid(
   date?: Date
 ): Promise<ApplicationNonAcceptingPeroidReason | true> {
   // Use now as default parameter value when date parameter not given
-  if (date === null) date = new Date();
+  if (date === null || typeof date === 'undefined')
+    date = new Date();
 
   // Check application date
   const locked = await db.configuration.findFirst({
