@@ -13,12 +13,10 @@ export const SetApplicationPeroidMutation = extendType({
           description:
             '입부원서 제출 시작일, ms 단위의 유닉스 타임스탬프 형식이다.',
         }),
-        end: nonNull(
-          intArg({
-            description:
-              '입부원서 제출 종료일, ms 단위의 유닉스 타임스탬프 형식이다.',
-          })
-        ),
+        end: intArg({
+          description:
+            '입부원서 제출 종료일, ms 단위의 유닉스 타임스탬프 형식이다.',
+        }),
       },
       description:
         '입부원서 제출 기간을 설정합니다. 시작일과 종료일이 둘 다 없을 시 상시모집으로 운영됩니다.',
