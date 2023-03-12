@@ -2,16 +2,14 @@ import { extendType } from 'nexus';
 import {
   applicationBeginDateConfigKey,
   applicationEndDateConfigKey,
-  ApplicationNonAcceptingPeroidReason,
-  isApplicationAcceptingPeroid,
 } from '../isApplicationAccepting';
 
 export const applicationBeginDate = extendType({
   type: 'Query',
   definition(t) {
-    t.int('applicationsBeginDate', {
+    t.string('applicationsBeginDate', {
       description:
-        '입부원서/재입부원서 접수 시작일입니다. ms 단위의 유닉스 타임스탬프 형식입니다.',
+        '입부원서/재입부원서 접수 시작일입니다. ISO 8601 형식의 문자열입니다.',
       async resolve(parent, args, ctx) {
         const beginDate = await ctx.db.configuration.findFirst(
           {
@@ -21,7 +19,14 @@ export const applicationBeginDate = extendType({
           }
         );
 
-        return JSON.parse(beginDate?.value ?? 'null');
+        const timestamp: number | null = JSON.parse(
+          beginDate?.value ?? 'null'
+        );
+        if (timestamp) {
+          return new Date(timestamp).toISOString();
+        } else {
+          return null;
+        }
       },
     });
   },
@@ -30,9 +35,9 @@ export const applicationBeginDate = extendType({
 export const applicationEndDate = extendType({
   type: 'Query',
   definition(t) {
-    t.int('applicationsEndDate', {
+    t.string('applicationsEndDate', {
       description:
-        '입부원서/재입부원서 접수 종료일입니다. ms 단위의 유닉스 타임스탬프 형식입니다.',
+        '입부원서/재입부원서 접수 종료일입니다. ISO 8601 형식의 문자열입니다.',
       async resolve(parent, args, ctx) {
         const beginDate = await ctx.db.configuration.findFirst(
           {
@@ -42,7 +47,14 @@ export const applicationEndDate = extendType({
           }
         );
 
-        return JSON.parse(beginDate?.value ?? 'null');
+        const timestamp: number | null = JSON.parse(
+          beginDate?.value ?? 'null'
+        );
+        if (timestamp) {
+          return new Date(timestamp).toISOString();
+        } else {
+          return null;
+        }
       },
     });
   },
