@@ -145,7 +145,7 @@ model ApplicationFormAdditionalQuestion {
 model ApplicationFormAdditionalAnswer {
   questionId    String
   applicationId String
-  answer        String
+  answer        String @db.LongText
   question      ApplicationFormAdditionalQuestion @relation(fields: [questionId], references: [id])
   form          ApplicationForm                   @relation(fields: [applicationId], references: [applicationId])
 
